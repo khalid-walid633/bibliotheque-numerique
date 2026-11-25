@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des emprunts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 35px;
+            background: #f4f6f9;
+        }
+
+        h1 {
+            color: #243447;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #243447;
+            color: white;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .accepter {
+            background: #198754;
+        }
+
+        .refuser {
+            background: #dc3545;
+        }
+
+        .vide {
+            padding: 20px;
+            background: white;
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #e2e3e5;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gestion des demandes d'emprunt</h1>
+
+    {% for message in messages %}
+        <div class="message">{{ message }}</div>
+    {% endfor %}
+
+    {% if demandes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Abonné</th>
+                    <th>Document</th>
+                    <th>Exemplaire</th>
+                    <th>Date de demande</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for emprunt in demandes %}
+                    <tr>
+                        <td>{{ emprunt.abonne.username }}</td>
+                        <td>{{ emprunt.exemplaire.document.titre }}</td>
+                        <td>{{ emprunt.exemplaire.code_inventaire }}</td>
+                        <td>{{ emprunt.date_demande|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input
+                                    type="hidden"
+                                    name="emprunt_id"
+                                    value="{{ emprunt.pk }}"
+                                >
+
+                                <button
+                                    class="accepter"
+                                    type="submit"
+                                    name="action"
+                                    value="accepter"
+                                >
+                                    Accepter
+                                </button>
+
+                                <button
+                                    class="refuser"
+                                    type="submit"
+                                    name="action"
+                                    value="refuser"
+                                >
+                                    Refuser
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="vide">
+            Aucune demande d'emprunt en attente.
+        </div>
+    {% endif %}
+
+</body>
+</html>

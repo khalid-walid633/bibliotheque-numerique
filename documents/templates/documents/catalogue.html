@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Catalogue - Bibliothèque Numérique</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'catalogue' %}">
+            Bibliothèque Numérique
+        </a>
+
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="{% url 'mes_emprunts' %}">
+                Mes emprunts
+            </a>
+            <a class="nav-link" href="{% url 'demander_emprunt' %}">
+                Demander un emprunt
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-5">
+
+    <div class="mb-4">
+        <h1 class="fw-bold">Catalogue numérique</h1>
+        <p class="text-secondary">
+            Découvrez les documents disponibles dans notre bibliothèque.
+        </p>
+    </div>
+
+    <form method="get" class="card card-body mb-4 shadow-sm">
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <input
+                    type="search"
+                    name="q"
+                    class="form-control"
+                    placeholder="Titre, auteur ou ISBN..."
+                    value="{{ recherche }}"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <select name="categorie" class="form-select">
+                    <option value="">Toutes les catégories</option>
+
+                    {% for categorie in categories %}
+                        <option
+                            value="{{ categorie.id }}"
+                            {% if categorie_selectionnee == categorie.id|stringformat:"s" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ categorie.nom }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">
+                    Rechercher
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="d-flex justify-content-between mb-3">
+        <h4>Documents</h4>
+        <span class="text-secondary">
+            {{ page_obj.paginator.count }} résultat(s)
+        </span>
+    </div>
+
+    <div class="row g-4">
+
+        {% for document in page_obj %}
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+
+                        <span class="badge bg-primary mb-2">
+                            {{ document.type_document }}
+                        </span>
+
+                        <h5 class="card-title">
+                            {{ document.titre }}
+                        </h5>
+
+                        <p class="text-secondary mb-1">
+                            Auteur : {{ document.auteur }}
+                        </p>
+
+                        <p class="text-secondary mb-1">
+                            Catégorie : {{ document.categorie.nom }}
+                        </p>
+
+                        <p class="text-secondary">
+                            Année : {{ document.annee_publication }}
+                        </p>
+
+                        <a
+                            href="{% url 'detail_document' document.pk %}"
+                            class="btn btn-outline-primary"
+                        >
+                            Voir les détails
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun document trouvé.
+                </div>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.previous_page_number }}">
+                            Précédent
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        {{ page_obj.number }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.next_page_number }}">
+                            Suivant
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endif %}
+
+</main>
+
+</body>
+</html>

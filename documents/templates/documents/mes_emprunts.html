@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes emprunts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f4f6f9;
+        }
+
+        h1 {
+            color: #243447;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #243447;
+            color: white;
+        }
+
+        .vide {
+            padding: 20px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mes emprunts</h1>
+
+    <p>Bienvenue {{ request.user.username }}.</p>
+
+    {% if emprunts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Auteur</th>
+                    <th>Code exemplaire</th>
+                    <th>Date de demande</th>
+                    <th>Date limite</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for emprunt in emprunts %}
+                    <tr>
+                        <td>{{ emprunt.exemplaire.document.titre }}</td>
+                        <td>{{ emprunt.exemplaire.document.auteur }}</td>
+                        <td>{{ emprunt.exemplaire.code_inventaire }}</td>
+                        <td>{{ emprunt.date_demande|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if emprunt.date_limite %}
+                                {{ emprunt.date_limite|date:"d/m/Y" }}
+                            {% else %}
+                                Non définie
+                            {% endif %}
+                        </td>
+                        <td>{{ emprunt.get_statut_display }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="vide">
+            Vous n'avez encore aucun emprunt.
+        </div>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'demander_emprunt' %}">
+            Demander un nouvel emprunt
+        </a>
+    </p>
+
+</body>
+</html>
