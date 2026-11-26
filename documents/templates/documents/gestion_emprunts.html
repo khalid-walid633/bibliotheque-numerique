@@ -5,126 +5,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des emprunts</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 35px;
             background: #f4f6f9;
-        }
-
-        h1 {
             color: #243447;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
+        .page-header {
             background: #243447;
             color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
         }
 
-        button {
-            padding: 8px 12px;
-            border: 0;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-        }
-
-        .accepter {
-            background: #198754;
-        }
-
-        .refuser {
-            background: #dc3545;
-        }
-
-        .vide {
-            padding: 20px;
+        .content-card {
             background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
         }
 
-        .message {
-            padding: 10px;
+        .table th {
+            background: #243447;
+            color: white;
+            white-space: nowrap;
+            padding: 15px;
+        }
+
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn {
+            border-radius: 6px;
+            padding: 8px 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .empty-state h4 {
+            color: #243447;
             margin-bottom: 10px;
-            background: #e2e3e5;
         }
     </style>
 </head>
+
 <body>
 
-    <h1>Gestion des demandes d'emprunt</h1>
+<div class="container py-5">
+
+    <div class="page-header">
+        <h1 class="h3 mb-2">Gestion des emprunts</h1>
+        <p class="mb-0">
+            Consultez les demandes et gérez les emprunts des abonnés.
+        </p>
+    </div>
 
     {% for message in messages %}
-        <div class="message">{{ message }}</div>
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Fermer">
+            </button>
+        </div>
     {% endfor %}
 
-    {% if demandes %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Abonné</th>
-                    <th>Document</th>
-                    <th>Exemplaire</th>
-                    <th>Date de demande</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+    <div class="content-card">
 
-            <tbody>
-                {% for emprunt in demandes %}
-                    <tr>
-                        <td>{{ emprunt.abonne.username }}</td>
-                        <td>{{ emprunt.exemplaire.document.titre }}</td>
-                        <td>{{ emprunt.exemplaire.code_inventaire }}</td>
-                        <td>{{ emprunt.date_demande|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <form method="post">
-                                {% csrf_token %}
-                                <input
-                                    type="hidden"
-                                    name="emprunt_id"
-                                    value="{{ emprunt.pk }}"
-                                >
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="h5 mb-0">Demandes en attente</h2>
 
-                                <button
-                                    class="accepter"
-                                    type="submit"
-                                    name="action"
-                                    value="accepter"
-                                >
-                                    Accepter
-                                </button>
-
-                                <button
-                                    class="refuser"
-                                    type="submit"
-                                    name="action"
-                                    value="refuser"
-                                >
-                                    Refuser
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="vide">
-            Aucune demande d'emprunt en attente.
+            <span class="badge text-bg-primary">
+                {{ demandes|length }} demande(s)
+            </span>
         </div>
-    {% endif %}
+
+        {% if demandes %}
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Abonné</th>
+                            <th>Document</th>
+                            <th>Exemplaire</th>
+                            <th>Date de demande</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for emprunt in demandes %}
+                            <tr>
+                                <td>
+                                    <strong>
+                                        {{ emprunt.abonne.username }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    {{ emprunt.exemplaire.document.titre }}
+                                </td>
+
+                                <td>
+                                    <span class="badge text-bg-secondary">
+                                        {{ emprunt.exemplaire.code_inventaire }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_demande|date:"d/m/Y H:i" }}
+                                </td>
+
+                                <td class="text-center">
+                                    <form method="post" class="d-flex justify-content-center gap-2 flex-wrap">
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="emprunt_id"
+                                            value="{{ emprunt.pk }}"
+                                        >
+
+                                        <button
+                                            class="btn btn-success btn-sm"
+                                            type="submit"
+                                            name="action"
+                                            value="accepter"
+                                        >
+                                            Accepter
+                                        </button>
+
+                                        <button
+                                            class="btn btn-danger btn-sm"
+                                            type="submit"
+                                            name="action"
+                                            value="refuser"
+                                        >
+                                            Refuser
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <h4>Aucune demande en attente</h4>
+                <p class="text-muted mb-0">
+                    Toutes les demandes d'emprunt ont été traitées.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

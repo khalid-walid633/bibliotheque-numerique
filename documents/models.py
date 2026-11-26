@@ -13,6 +13,11 @@ class Categorie(models.Model):
 
 
 class Document(models.Model):
+    image = models.ImageField(
+    upload_to="couvertures/",
+    blank=True,
+    null=True
+)
 
     class TypeDocument(models.TextChoices):
         LIVRE = 'LIVRE', 'Livre'

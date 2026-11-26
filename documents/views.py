@@ -68,8 +68,11 @@ def mes_emprunts(request):
 def gestion_emprunts(request):
     # Réserver cette page au bibliothécaire et à l'administrateur
     if not (
-        request.user.is_superuser
-        or request.user.role == "BIBLIOTHECAIRE"
+    request.user.is_superuser
+    or request.user.role in [
+        Utilisateur.Role.ADMIN,
+        Utilisateur.Role.BIBLIOTHECAIRE
+    ]
     ):
         return HttpResponseForbidden(
             "Accès réservé au bibliothécaire."
@@ -199,9 +202,12 @@ def detail_document(request, pk):
 def tableau_bord(request):
 
     if not (
-        request.user.is_superuser
-        or request.user.role == "BIBLIOTHECAIRE"
-    ):
+    request.user.is_superuser
+    or request.user.role in [
+        Utilisateur.Role.ADMIN,
+        Utilisateur.Role.BIBLIOTHECAIRE
+    ]
+):
         return HttpResponseForbidden(
             "Accès réservé au bibliothécaire."
         )

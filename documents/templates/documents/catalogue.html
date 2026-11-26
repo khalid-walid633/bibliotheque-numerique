@@ -1,44 +1,428 @@
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Catalogue - Bibliothèque Numérique</title>
+    <title>Catalogue | Bibliothèque Numérique</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f5f2e9;
+            --surface: #fffdf8;
+            --surface-soft: #eee9dc;
+            --text: #26352d;
+            --muted: #778078;
+            --primary: #315b45;
+            --primary-hover: #244633;
+            --accent: #c49a50;
+            --border: #e5dfd1;
+            --shadow: 0 8px 25px rgba(38, 53, 45, 0.07);
+            --nav: #203d30;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #171d1a;
+            --surface: #222b26;
+            --surface-soft: #303b34;
+            --text: #edf1e9;
+            --muted: #aab5ac;
+            --primary: #83ad91;
+            --primary-hover: #a3c6ad;
+            --accent: #d6b36d;
+            --border: #3a473e;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            --nav: #111a15;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", Arial, sans-serif;
+            transition: background .25s, color .25s;
+        }
+
+        .navbar {
+            background: var(--nav);
+            padding: 14px 0;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-size: 1.15rem;
+            letter-spacing: .2px;
+        }
+
+        .navbar .nav-link {
+            color: #dce7dd;
+            margin-left: 12px;
+        }
+
+        .navbar .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .theme-button {
+            border: 1px solid rgba(255,255,255,.35);
+            color: white;
+            background: transparent;
+            border-radius: 30px;
+            padding: 7px 13px;
+            margin-left: 15px;
+        }
+
+        .theme-button:hover {
+            background: rgba(255,255,255,.12);
+        }
+
+        .hero {
+            padding: 42px 0 28px;
+        }
+
+        .hero-label {
+            color: var(--primary);
+            font-size: .8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero h1 {
+            font-family: Georgia, serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 600px;
+        }
+
+        .search-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            margin-bottom: 32px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            min-height: 44px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--surface);
+            color: var(--text);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 .2rem rgba(49, 91, 69, .12);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted);
+        }
+
+        .btn-search {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            min-height: 44px;
+            font-weight: 600;
+        }
+
+        .btn-search:hover {
+            background: var(--primary-hover);
+            color: #fff;
+        }
+
+        .section-heading {
+            font-family: Georgia, serif;
+            font-weight: 700;
+        }
+
+        .results-count {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .book-card {
+            height: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 30px rgba(0,0,0,.13);
+        }
+
+        .cover-area {
+            height: 220px;
+            background: var(--surface-soft);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .book-cover {
+            max-width: 100%;
+            max-height: 195px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 3px;
+            box-shadow: 0 5px 14px rgba(0,0,0,.18);
+        }
+
+        .no-cover {
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .book-card .card-body {
+            padding: 18px;
+        }
+
+        .book-title {
+            color: var(--text);
+            font-family: Georgia, serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+            line-height: 1.4;
+            min-height: 48px;
+        }
+
+        .book-info {
+            color: var(--muted);
+            font-size: .88rem;
+            margin-bottom: 7px;
+        }
+
+        .book-type {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .book-category {
+            background: var(--surface-soft);
+            color: var(--text);
+        }
+
+        .btn-details {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 9px;
+        }
+
+        .btn-details:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .empty-state {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 45px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .pagination .page-link {
+            background: var(--surface);
+            color: var(--primary);
+            border-color: var(--border);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        footer {
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: 55px;
+            padding: 22px 0;
+            text-align: center;
+            font-size: .85rem;
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding-top: 30px;
+            }
+
+            .cover-area {
+                height: 200px;
+            }
+
+            .theme-button {
+                margin: 10px 0 0;
+            }
+        }
+        /* Responsive : smartphones */
+@media (max-width: 575.98px) {
+
+    .container {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .hero {
+        padding-top: 28px;
+        padding-bottom: 20px;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+        line-height: 1.25;
+    }
+
+    .hero p {
+        font-size: .9rem;
+    }
+
+    .search-panel {
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .section-heading {
+        font-size: 1.15rem;
+    }
+
+    .cover-area {
+        height: 260px;
+    }
+
+    .book-cover {
+        max-height: 235px;
+    }
+
+    .book-card .card-body {
+        padding: 16px;
+    }
+
+    .book-title {
+        min-height: auto;
+        font-size: 1.1rem;
+    }
+
+    .navbar-brand {
+        font-size: .95rem;
+    }
+
+    .navbar .nav-link {
+        margin-left: 0;
+        padding: 10px 0;
+    }
+
+    .theme-button {
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+}
+
+/* Tablettes */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .cover-area {
+        height: 220px;
+    }
+}
+
+/* Écrans larges */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'catalogue' %}">
-            Bibliothèque Numérique
+
+        <a class="navbar-brand fw-bold" href="{% url 'catalogue' %}">
+            📚 Bibliothèque Numérique
         </a>
 
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="{% url 'mes_emprunts' %}">
-                Mes emprunts
-            </a>
-            <a class="nav-link" href="{% url 'demander_emprunt' %}">
-                Demander un emprunt
-            </a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false"
+                aria-label="Ouvrir le menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <div class="navbar-nav ms-auto align-items-lg-center">
+
+                <a class="nav-link" href="{% url 'catalogue' %}">
+                    Catalogue
+                </a>
+
+                <a class="nav-link" href="{% url 'mes_emprunts' %}">
+                    Mes emprunts
+                </a>
+
+                <a class="nav-link" href="{% url 'demander_emprunt' %}">
+                    Demander un emprunt
+                </a>
+
+                <button type="button" class="theme-button"
+                        id="themeToggle" aria-label="Changer le thème">
+                    🌙 Mode sombre
+                </button>
+
+            </div>
         </div>
     </div>
 </nav>
 
-<main class="container py-5">
+<main class="container">
 
-    <div class="mb-4">
-        <h1 class="fw-bold">Catalogue numérique</h1>
-        <p class="text-secondary">
-            Découvrez les documents disponibles dans notre bibliothèque.
+    <section class="hero">
+        <div class="hero-label">Votre espace de lecture</div>
+
+        <h1>Explorez notre bibliothèque</h1>
+
+        <p>
+            Découvrez notre collection de livres et de documents.
+            Recherchez vos lectures préférées et consultez leurs informations.
         </p>
-    </div>
+    </section>
 
-    <form method="get" class="card card-body mb-4 shadow-sm">
+    <!-- Recherche et filtre -->
+    <form method="get" class="search-panel">
         <div class="row g-3">
 
             <div class="col-md-6">
@@ -46,7 +430,7 @@
                     type="search"
                     name="q"
                     class="form-control"
-                    placeholder="Titre, auteur ou ISBN..."
+                    placeholder="Rechercher un titre, un auteur ou un ISBN..."
                     value="{{ recherche }}"
                 >
             </div>
@@ -69,7 +453,7 @@
             </div>
 
             <div class="col-md-2">
-                <button class="btn btn-primary w-100" type="submit">
+                <button class="btn btn-search w-100" type="submit">
                     Rechercher
                 </button>
             </div>
@@ -77,58 +461,89 @@
         </div>
     </form>
 
-    <div class="d-flex justify-content-between mb-3">
-        <h4>Documents</h4>
-        <span class="text-secondary">
-            {{ page_obj.paginator.count }} résultat(s)
+    <!-- Résultats -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-heading h4 mb-0">Notre collection</h2>
+
+        <span class="results-count">
+            {{ page_obj.paginator.count }} document(s)
         </span>
     </div>
 
+    <!-- Cartes des livres -->
     <div class="row g-4">
 
         {% for document in page_obj %}
-            <div class="col-md-6 col-lg-4">
 
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
+            <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
 
-                        <span class="badge bg-primary mb-2">
-                            {{ document.type_document }}
-                        </span>
+                <article class="card book-card">
 
-                        <h5 class="card-title">
+                    <div class="cover-area">
+
+                        {% if document.image %}
+                            <img
+                                src="{{ document.image.url }}"
+                                class="book-cover"
+                                alt="Couverture de {{ document.titre }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="no-cover">
+                                <div style="font-size: 3rem;">📖</div>
+                                <p class="mb-0">Couverture indisponible</p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="mb-3">
+                            <span class="badge book-type">
+                                {{ document.type_document }}
+                            </span>
+
+                            <span class="badge book-category">
+                                {{ document.categorie.nom }}
+                            </span>
+                        </div>
+
+                        <h3 class="book-title">
                             {{ document.titre }}
-                        </h5>
+                        </h3>
 
-                        <p class="text-secondary mb-1">
-                            Auteur : {{ document.auteur }}
+                        <p class="book-info">
+                            <strong>Auteur :</strong> {{ document.auteur }}
                         </p>
 
-                        <p class="text-secondary mb-1">
-                            Catégorie : {{ document.categorie.nom }}
-                        </p>
-
-                        <p class="text-secondary">
-                            Année : {{ document.annee_publication }}
+                        <p class="book-info mb-4">
+                            <strong>Année :</strong>
+                            {{ document.annee_publication }}
                         </p>
 
                         <a
                             href="{% url 'detail_document' document.pk %}"
-                            class="btn btn-outline-primary"
+                            class="btn btn-details mt-auto"
                         >
-                            Voir les détails
+                            Consulter le livre →
                         </a>
 
                     </div>
-                </div>
+
+                </article>
 
             </div>
 
         {% empty %}
 
             <div class="col-12">
-                <div class="alert alert-info">
-                    Aucun document trouvé.
+                <div class="empty-state">
+                    <div style="font-size: 3rem;">📚</div>
+                    <h3 class="h5 mt-3">Aucun document trouvé</h3>
+                    <p class="mb-0">
+                        Essayez de modifier votre recherche ou votre catégorie.
+                    </p>
                 </div>
             </div>
 
@@ -136,8 +551,10 @@
 
     </div>
 
+    <!-- Pagination -->
     {% if page_obj.has_other_pages %}
-        <nav class="mt-5">
+
+        <nav class="mt-5" aria-label="Pagination du catalogue">
             <ul class="pagination justify-content-center">
 
                 {% if page_obj.has_previous %}
@@ -151,7 +568,7 @@
 
                 <li class="page-item active">
                     <span class="page-link">
-                        {{ page_obj.number }}
+                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
                     </span>
                 </li>
 
@@ -166,9 +583,58 @@
 
             </ul>
         </nav>
+
     {% endif %}
 
 </main>
+
+<footer>
+    <div class="container">
+        📚 Bibliothèque Numérique — Votre savoir, votre espace.
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const themeToggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    function applyTheme(theme) {
+        html.setAttribute("data-theme", theme);
+
+        if (theme === "dark") {
+            themeToggle.textContent = "☀️ Mode clair";
+        } else {
+            themeToggle.textContent = "🌙 Mode sombre";
+        }
+    }
+
+    // Charger le thème sauvegardé
+    let savedTheme = "light";
+
+    try {
+        savedTheme = localStorage.getItem("bibliotheque-theme") || "light";
+    } catch (error) {
+        savedTheme = "light";
+    }
+
+    applyTheme(savedTheme);
+
+    // Changer le thème avec un clic
+    themeToggle.addEventListener("click", function () {
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        applyTheme(newTheme);
+
+        try {
+            localStorage.setItem("bibliotheque-theme", newTheme);
+        } catch (error) {
+            // Le changement de thème fonctionne même si le stockage est indisponible.
+        }
+    });
+</script>
 
 </body>
 </html>

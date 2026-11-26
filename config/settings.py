@@ -138,3 +138,5 @@ MAILERS = {
 AUTH_USER_MODEL = 'users.Utilisateur'
 LOGIN_REDIRECT_URL = "mes_emprunts"
 LOGOUT_REDIRECT_URL = "login"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
