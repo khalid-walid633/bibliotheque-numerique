@@ -24,6 +24,7 @@ urlpatterns = [
     ),
 
     path("emprunts/", include("documents.urls")),
+    path("utilisateurs/", include("users.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(

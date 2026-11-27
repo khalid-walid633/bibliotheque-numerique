@@ -1,0 +1,153 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Bibliothèque Numérique{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+            <div>
+                <h5>Bibliothèque</h5>
+                <small>NUMÉRIQUE</small>
+            </div>
+        </div>
+
+        <div class="sidebar-section">MENU PRINCIPAL</div>
+
+        <nav class="sidebar-nav">
+
+            <!-- Tableau de bord -->
+            <a href="{% url 'tableau_bord' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'tableau_bord' %}active{% endif %}">
+                <i class="bi bi-grid"></i>
+                <span>Tableau de bord</span>
+            </a>
+
+            <!-- Catalogue -->
+            <a href="{% url 'catalogue' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'catalogue' %}active{% endif %}">
+                <i class="bi bi-journals"></i>
+                <span>Catalogue</span>
+            </a>
+
+            <!-- Gestion des emprunts -->
+            <a href="{% url 'gestion_emprunts' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'gestion_emprunts' %}active{% endif %}">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Gestion des emprunts</span>
+            </a>
+
+            <!-- Statistiques -->
+            <a href="{% url 'statistiques_bibliotheque' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'statistiques_bibliotheque' %}active{% endif %}">
+                <i class="bi bi-bar-chart"></i>
+                <span>Statistiques</span>
+            </a>
+
+            <!-- Abonnés -->
+            <a href="{% url 'liste_abonnes' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'liste_abonnes' %}active{% endif %}">
+                <i class="bi bi-people"></i>
+                <span>Abonnés</span>
+            </a>
+
+            <!-- Paramètres -->
+            <a href="{% url 'parametres_bibliotheque' %}"
+               class="nav-link-custom {% if request.resolver_match.url_name == 'parametres_bibliotheque' %}active{% endif %}">
+                <i class="bi bi-gear"></i>
+                <span>Paramètres</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-section">COMPTE</div>
+
+            <div class="user-mini">
+                <div class="user-avatar">
+                    {{ request.user.username|first|upper }}
+                </div>
+                <div class="user-info">
+                    <strong>{{ request.user.username }}</strong>
+                    <small>{{ request.user.get_role_display|default:"Utilisateur" }}</small>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Déconnexion
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+    <main class="main-area">
+
+        <header class="topbar">
+            <button class="icon-button mobile-menu" id="menuToggle" type="button" aria-label="Ouvrir le menu">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div class="topbar-title">
+                <span>ESPACE DE GESTION</span>
+                <strong>{% block page_heading %}Bibliothèque Numérique{% endblock %}</strong>
+            </div>
+
+            <button class="icon-button" id="themeToggle" type="button" aria-label="Changer le thème">
+                <i class="bi bi-sun-fill"></i>
+            </button>
+        </header>
+
+        <section class="page-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+        <footer class="app-footer">
+            Bibliothèque Numérique · Gestion documentaire
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/theme.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>
