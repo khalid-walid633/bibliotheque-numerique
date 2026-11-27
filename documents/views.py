@@ -4,11 +4,21 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-
-from .models import Exemplaire, Emprunt
-from .services import valider_emprunt, enregistrer_retour
+from decimal import Decimal, InvalidOperation
+from .models import (
+    Emprunt,
+    Exemplaire,
+    Penalite,
+    Document,
+    Categorie,
+    ParametresBibliotheque,
+) 
+from .services import (
+    valider_emprunt,
+    enregistrer_retour,
+    obtenir_parametres,
+)
 from django.core.paginator import Paginator
-from .models import Document, Categorie
 from django.db.models import Count, Q, Sum
 from users.models import Utilisateur
 
@@ -297,3 +307,48 @@ def mes_penalites(request):
             "total_penalites": total_penalites,
         }
     )
+
+@login_required
+def parametres_bibliotheque(request):
+    if not (
+        request.user.is_superuser
+        or request.user.role in [
+            Utilisateur.Role.ADMIN,
+            Utilisateur.Role.BIBLIOTHECAIRE,
+        ]
+    ):
+        return HttpResponseForbidden(
+            "Accès réservé au bibliothécaire ou à l'administrateur."
+        )
+
+    parametres = obtenir_parametres()
+
+    if request.method == "POST":
+        try:
+            duree = int(request.POST.get("duree_emprunt", 0))
+            tarif = Decimal(request.POST.get("tarif_penalite", "0"))
+
+            if duree <= 0 or tarif < 0:
+                raise ValueError
+
+            parametres.duree_emprunt = duree
+            parametres.tarif_penalite = tarif
+            parametres.save()
+
+            messages.success(
+                request,
+                "Les paramètres ont été enregistrés avec succès."
+            )
+
+        except (ValueError, TypeError, InvalidOperation):
+            messages.error(
+                request,
+                "Veuillez saisir une durée positive et un tarif valide."
+            )
+
+    return render(
+        request,
+        "documents/parametres_bibliotheque.html",
+        {"parametres": parametres}
+    )
+

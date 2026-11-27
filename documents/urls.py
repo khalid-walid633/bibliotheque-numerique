@@ -29,4 +29,11 @@ urlpatterns = [
     name="tableau_bord"
     ),
     path("mes-penalites/", views.mes_penalites, name="mes_penalites"),
+
+    path(
+    "parametres/",
+    views.parametres_bibliotheque,
+    name="parametres_bibliotheque"
+    ),
+
 ]

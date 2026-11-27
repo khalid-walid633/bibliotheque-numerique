@@ -114,18 +114,27 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMenu">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{% url 'catalogue' %}">
-                    Catalogue
-                </a>
+            
+<div class="navbar-nav ms-auto">
 
-                <a class="nav-link" href="{% url 'gestion_emprunts' %}">
-                    Gestion des emprunts
-                </a>
+    <a class="nav-link" href="{% url 'catalogue' %}">
+        Catalogue
+    </a>
 
-                <a class="nav-link" href="/admin/">
-                    Administration
-                </a>
+    <a class="nav-link" href="{% url 'gestion_emprunts' %}">
+        Gestion des emprunts
+    </a>
+
+    <a class="nav-link" href="{% url 'parametres_bibliotheque' %}">
+        Paramètres de la bibliothèque
+    </a>
+
+    <a class="nav-link" href="/admin/">
+        Administration
+    </a>
+
+</div>
+
             </div>
         </div>
     </div>
