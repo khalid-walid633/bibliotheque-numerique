@@ -127,6 +127,19 @@
             </div>
         </div>
     </div>
+    </div> <!-- Fin de la première carte -->
+
+    <!-- Nouvelle carte : évolution des pénalités -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Évolution des pénalités par mois</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="penalitesChart"></canvas>
+        </div>
+    </div>
+
+</div> <!-- Fin du container -->
 
 </div>
 
@@ -159,6 +172,31 @@
         }
     });
 </script>
+
+<script>
+    const penalitesCtx = document.getElementById('penalitesChart');
+
+    new Chart(penalitesCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels_penalites|safe }},
+            datasets: [{
+                label: 'Pénalités (DH)',
+                data: {{ valeurs_penalites|safe }},
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
 
 </body>
 </html>

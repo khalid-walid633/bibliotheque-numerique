@@ -1,3 +1,5 @@
+import json
+from django.db.models.functions import TruncMonth
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -400,6 +402,24 @@ def statistiques_bibliotheque(request):
     total_jours_retard = Penalite.objects.aggregate(
         total=Sum("jours_retard")
     )["total"] or 0
+    # Évolution des pénalités par mois
+    penalites_par_mois = (
+        Penalite.objects
+        .annotate(mois=TruncMonth("date_creation"))
+        .values("mois")
+        .annotate(total=Sum("montant"))
+        .order_by("mois")
+    )
+
+    labels_penalites = [
+        item["mois"].strftime("%m/%Y")
+        for item in penalites_par_mois
+    ]
+
+    valeurs_penalites = [
+        float(item["total"])
+        for item in penalites_par_mois
+    ]
 
     context = {
         "total_emprunts": total_emprunts,
@@ -410,6 +430,8 @@ def statistiques_bibliotheque(request):
         "total_penalites": total_penalites,
         "nombre_penalites": nombre_penalites,
         "total_jours_retard": total_jours_retard,
+	    "labels_penalites": json.dumps(labels_penalites),
+	    "valeurs_penalites": json.dumps(valeurs_penalites),
     }
 
     return render(
