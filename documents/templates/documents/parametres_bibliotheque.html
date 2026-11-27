@@ -1,4 +1,4 @@
-
+{% load l10n %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -80,7 +80,7 @@
                         name="tarif_penalite"
                         min="0"
                         step="0.01"
-                        value="{{ parametres.tarif_penalite }}"
+                        value="{{ parametres.tarif_penalite|unlocalize }}"
                         required
                     >
 
