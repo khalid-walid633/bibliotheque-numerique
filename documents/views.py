@@ -9,7 +9,7 @@ from .models import Exemplaire, Emprunt
 from .services import valider_emprunt, enregistrer_retour
 from django.core.paginator import Paginator
 from .models import Document, Categorie
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from users.models import Utilisateur
 
 @login_required
@@ -145,6 +145,13 @@ def gestion_emprunts(request):
     ).select_related(
         "abonne", "exemplaire__document"
     ).order_by("date_limite")
+    emprunts_termines = Emprunt.objects.filter(
+    statut=Emprunt.Statut.TERMINEE
+    ).select_related(
+        "abonne", "exemplaire__document"
+    ).prefetch_related(
+        "penalite"
+    ).order_by("-date_retour")
 
     return render(
     request,
@@ -152,6 +159,7 @@ def gestion_emprunts(request):
     {
         "demandes": demandes,
         "emprunts_actifs": emprunts_actifs,
+        "emprunts_termines": emprunts_termines,
         "today": timezone.localdate(),
     }
     )
@@ -263,5 +271,29 @@ def tableau_bord(request):
         {
             "statistiques": statistiques,
             "dernieres_demandes": dernieres_demandes,
+        }
+    )
+
+@login_required
+def mes_penalites(request):
+    emprunts = Emprunt.objects.filter(
+        abonne=request.user,
+        statut=Emprunt.Statut.TERMINEE
+    ).select_related(
+        "exemplaire__document"
+    ).prefetch_related(
+        "penalite"
+    ).order_by("-date_retour")
+
+    total_penalites = emprunts.aggregate(
+        total=Sum("penalite__montant")
+    )["total"] or 0
+
+    return render(
+        request,
+        "documents/mes_penalites.html",
+        {
+            "emprunts": emprunts,
+            "total_penalites": total_penalites,
         }
     )

@@ -298,5 +298,81 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- HISTORIQUE DES EMPRUNTS TERMINÉS -->
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Historique des emprunts terminés</h4>
+    </div>
+
+    <div class="card-body">
+        {% if emprunts_termines %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Abonné</th>
+                            <th>Document</th>
+                            <th>Date d'emprunt</th>
+                            <th>Date limite</th>
+                            <th>Date de retour</th>
+                            <th>Retard</th>
+                            <th>Pénalité</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for emprunt in emprunts_termines %}
+                            <tr>
+                                <td>{{ emprunt.abonne.username }}</td>
+
+                                <td>
+                                    {{ emprunt.exemplaire.document.titre }}
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_emprunt|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_limite|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_retour|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    {% if emprunt.penalite %}
+                                        {{ emprunt.penalite.jours_retard }} jour(s)
+                                    {% else %}
+                                        0 jour
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if emprunt.penalite %}
+                                        <span class="badge text-bg-danger">
+                                            {{ emprunt.penalite.montant }} DH
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-success">
+                                            Aucune pénalité
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">
+                Aucun emprunt terminé pour le moment.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+
 </body>
 </html>

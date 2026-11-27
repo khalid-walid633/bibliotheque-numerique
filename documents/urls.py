@@ -28,4 +28,5 @@ urlpatterns = [
     views.tableau_bord,
     name="tableau_bord"
     ),
+    path("mes-penalites/", views.mes_penalites, name="mes_penalites"),
 ]
