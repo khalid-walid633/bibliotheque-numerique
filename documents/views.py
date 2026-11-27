@@ -3,9 +3,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from .models import Exemplaire, Emprunt
-from .services import valider_emprunt
+from .services import valider_emprunt, enregistrer_retour
 from django.core.paginator import Paginator
 from .models import Document, Categorie
 from django.db.models import Count, Q
@@ -66,13 +67,12 @@ def mes_emprunts(request):
 
 @login_required
 def gestion_emprunts(request):
-    # Réserver cette page au bibliothécaire et à l'administrateur
     if not (
-    request.user.is_superuser
-    or request.user.role in [
-        Utilisateur.Role.ADMIN,
-        Utilisateur.Role.BIBLIOTHECAIRE
-    ]
+        request.user.is_superuser
+        or request.user.role in [
+            Utilisateur.Role.ADMIN,
+            Utilisateur.Role.BIBLIOTHECAIRE
+        ]
     ):
         return HttpResponseForbidden(
             "Accès réservé au bibliothécaire."
@@ -83,42 +83,52 @@ def gestion_emprunts(request):
         action = request.POST.get("action")
 
         try:
-            emprunt = Emprunt.objects.get(
-                pk=emprunt_id,
-                statut=Emprunt.Statut.DEMANDEE
-            )
-
-            if action == "accepter":
-                valider_emprunt(
-                    emprunt_id=emprunt.pk,
-                    bibliothecaire=request.user,
-                    duree_jours=14
+            if action == "retour":
+                enregistrer_retour(
+                    emprunt_id=emprunt_id,
+                    bibliothecaire=request.user
                 )
                 messages.success(
                     request,
-                    f"La demande #{emprunt.pk} a été acceptée."
-                )
-
-            elif action == "refuser":
-                emprunt.statut = Emprunt.Statut.REFUSEE
-                emprunt.bibliothecaire = request.user
-                emprunt.save(
-                    update_fields=["statut", "bibliothecaire"]
-                )
-                messages.success(
-                    request,
-                    f"La demande #{emprunt.pk} a été refusée."
+                    f"Le retour de l'emprunt #{emprunt_id} a été enregistré."
                 )
 
             else:
-                messages.error(request, "Action invalide.")
+                emprunt = Emprunt.objects.get(
+                    pk=emprunt_id,
+                    statut=Emprunt.Statut.DEMANDEE
+                )
+
+                if action == "accepter":
+                    valider_emprunt(
+                        emprunt_id=emprunt.pk,
+                        bibliothecaire=request.user,
+                        duree_jours=14
+                    )
+                    messages.success(
+                        request,
+                        f"La demande #{emprunt.pk} a été acceptée."
+                    )
+
+                elif action == "refuser":
+                    emprunt.statut = Emprunt.Statut.REFUSEE
+                    emprunt.bibliothecaire = request.user
+                    emprunt.save(
+                        update_fields=["statut", "bibliothecaire"]
+                    )
+                    messages.success(
+                        request,
+                        f"La demande #{emprunt.pk} a été refusée."
+                    )
+
+                else:
+                    messages.error(request, "Action invalide.")
 
         except Emprunt.DoesNotExist:
             messages.error(
                 request,
                 "Demande introuvable ou déjà traitée."
             )
-
         except ValidationError as erreur:
             messages.error(request, str(erreur))
 
@@ -127,14 +137,23 @@ def gestion_emprunts(request):
     demandes = Emprunt.objects.filter(
         statut=Emprunt.Statut.DEMANDEE
     ).select_related(
-        "abonne",
-        "exemplaire__document"
+        "abonne", "exemplaire__document"
     ).order_by("date_demande")
 
+    emprunts_actifs = Emprunt.objects.filter(
+        statut=Emprunt.Statut.EN_COURS
+    ).select_related(
+        "abonne", "exemplaire__document"
+    ).order_by("date_limite")
+
     return render(
-        request,
-        "documents/gestion_emprunts.html",
-        {"demandes": demandes}
+    request,
+    "documents/gestion_emprunts.html",
+    {
+        "demandes": demandes,
+        "emprunts_actifs": emprunts_actifs,
+        "today": timezone.localdate(),
+    }
     )
 
 def catalogue(request):

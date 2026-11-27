@@ -69,6 +69,7 @@
 
 <div class="container py-5">
 
+    <!-- En-tête -->
     <div class="page-header">
         <h1 class="h3 mb-2">Gestion des emprunts</h1>
         <p class="mb-0">
@@ -76,6 +77,7 @@
         </p>
     </div>
 
+    <!-- Messages Django -->
     {% for message in messages %}
         <div class="alert alert-info alert-dismissible fade show" role="alert">
             {{ message }}
@@ -86,6 +88,8 @@
     {% endfor %}
 
     <div class="content-card">
+
+        <!-- SECTION 1 : DEMANDES EN ATTENTE -->
 
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
             <h2 class="h5 mb-0">Demandes en attente</h2>
@@ -175,6 +179,114 @@
                 <h4>Aucune demande en attente</h4>
                 <p class="text-muted mb-0">
                     Toutes les demandes d'emprunt ont été traitées.
+                </p>
+            </div>
+
+        {% endif %}
+
+
+        <!-- SECTION 2 : EMPRUNTS EN COURS -->
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="h5 mb-0">Emprunts en cours</h2>
+
+            <span class="badge text-bg-warning">
+                {{ emprunts_actifs|length }} emprunt(s)
+            </span>
+        </div>
+
+        {% if emprunts_actifs %}
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Abonné</th>
+                            <th>Document</th>
+                            <th>Exemplaire</th>
+                            <th>Date d'emprunt</th>
+                            <th>Date limite</th>
+                            <th>État</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for emprunt in emprunts_actifs %}
+                            <tr>
+                                <td>
+                                    <strong>
+                                        {{ emprunt.abonne.username }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    {{ emprunt.exemplaire.document.titre }}
+                                </td>
+
+                                <td>
+                                    <span class="badge text-bg-secondary">
+                                        {{ emprunt.exemplaire.code_inventaire }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_emprunt|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    {{ emprunt.date_limite|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    {% if emprunt.date_limite < today %}
+                                        <span class="badge text-bg-danger">
+                                            En retard
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-success">
+                                            En cours
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <form method="post">
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="emprunt_id"
+                                            value="{{ emprunt.pk }}"
+                                        >
+
+                                        <button
+                                            class="btn btn-primary btn-sm"
+                                            type="submit"
+                                            name="action"
+                                            value="retour"
+                                            onclick="return confirm('Confirmer le retour de cet exemplaire ?');"
+                                        >
+                                            Enregistrer le retour
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <h4>Aucun emprunt en cours</h4>
+                <p class="text-muted mb-0">
+                    Les emprunts actifs apparaîtront ici.
                 </p>
             </div>
 
