@@ -352,3 +352,68 @@ def parametres_bibliotheque(request):
         {"parametres": parametres}
     )
 
+
+@login_required
+def statistiques_bibliotheque(request):
+
+    # Vérifier les autorisations
+    if not (
+        request.user.is_superuser
+        or request.user.role in [
+            Utilisateur.Role.ADMIN,
+            Utilisateur.Role.BIBLIOTHECAIRE,
+        ]
+    ):
+        return HttpResponseForbidden(
+            "Accès réservé au bibliothécaire ou à l'administrateur."
+        )
+
+    aujourd_hui = timezone.localdate()
+
+    # Statistiques des emprunts
+    total_emprunts = Emprunt.objects.count()
+
+    demandes_attente = Emprunt.objects.filter(
+        statut=Emprunt.Statut.DEMANDEE
+    ).count()
+
+    emprunts_actifs = Emprunt.objects.filter(
+        statut=Emprunt.Statut.EN_COURS
+    ).count()
+
+    emprunts_termines = Emprunt.objects.filter(
+        statut=Emprunt.Statut.TERMINEE
+    ).count()
+
+    emprunts_retard = Emprunt.objects.filter(
+        statut=Emprunt.Statut.EN_COURS,
+        date_limite__lt=aujourd_hui
+    ).count()
+
+    # Statistiques financières
+    total_penalites = Penalite.objects.aggregate(
+        total=Sum("montant")
+    )["total"] or 0
+
+    nombre_penalites = Penalite.objects.count()
+
+    total_jours_retard = Penalite.objects.aggregate(
+        total=Sum("jours_retard")
+    )["total"] or 0
+
+    context = {
+        "total_emprunts": total_emprunts,
+        "demandes_attente": demandes_attente,
+        "emprunts_actifs": emprunts_actifs,
+        "emprunts_termines": emprunts_termines,
+        "emprunts_retard": emprunts_retard,
+        "total_penalites": total_penalites,
+        "nombre_penalites": nombre_penalites,
+        "total_jours_retard": total_jours_retard,
+    }
+
+    return render(
+        request,
+        "documents/statistiques_bibliotheque.html",
+        context
+    )

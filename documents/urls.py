@@ -35,5 +35,10 @@ urlpatterns = [
     views.parametres_bibliotheque,
     name="parametres_bibliotheque"
     ),
+    path(
+    "statistiques/",
+    views.statistiques_bibliotheque,
+    name="statistiques_bibliotheque"
+    ),
 
 ]
