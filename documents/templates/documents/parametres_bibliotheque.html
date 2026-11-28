@@ -1,113 +1,207 @@
+
+{% extends "base.html" %}
 {% load l10n %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paramètres de la bibliothèque</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-</head>
+{% block title %}Paramètres | Bibliothèque Numérique{% endblock %}
+{% block page_heading %}Paramètres{% endblock %}
 
-<body class="bg-light">
+{% block extra_css %}
+<style>
+    .settings-intro {
+        margin-bottom: 30px;
+    }
 
-<div class="container py-5">
+    .settings-intro h2 {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    .settings-card {
+        max-width: 850px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .settings-header {
+        padding: 22px 25px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .settings-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: var(--surface-soft);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+    }
+
+    .settings-body {
+        padding: 28px;
+    }
+
+    .setting-field {
+        margin-bottom: 28px;
+    }
+
+    .setting-field label {
+        font-weight: 700;
+        margin-bottom: 9px;
+    }
+
+    .setting-field .form-control {
+        min-height: 48px;
+        max-width: 400px;
+    }
+
+    .setting-field .form-text {
+        margin-top: 8px;
+        color: var(--text-muted);
+    }
+
+    .settings-info {
+        max-width: 850px;
+        margin-top: 22px;
+        padding: 17px 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--surface-soft);
+        color: var(--text);
+    }
+
+    @media (max-width: 576px) {
+        .settings-body {
+            padding: 20px;
+        }
+
+        .settings-header {
+            padding: 18px;
+        }
+    }
+    .btn-save {
+    background: var(--primary);
+    color: white;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 11px 20px;
+    transition: 0.2s ease;
+}
+
+    .btn-save:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-intro">
+    <h2>Configuration de la bibliothèque</h2>
+    <p class="text-muted mb-0">
+        Gérez les règles d'emprunt et les tarifs des pénalités.
+    </p>
+</div>
+
+
+
+<div class="settings-card">
+
+    <div class="settings-header">
+        <div class="settings-icon">
+            <i class="bi bi-gear"></i>
+        </div>
+
         <div>
-            <h2>Paramètres de la bibliothèque</h2>
-            <p class="text-muted mb-0">
+            <h3 class="h5 fw-bold mb-1">Paramètres généraux</h3>
+            <p class="text-muted mb-0 small">
                 Configuration des emprunts et des pénalités
             </p>
         </div>
-
-        <a href="{% url 'tableau_bord' %}" class="btn btn-outline-primary">
-            Retour au tableau de bord
-        </a>
     </div>
 
-    <!-- Messages Django -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert"></button>
+    <div class="settings-body">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="setting-field">
+                <label for="duree_emprunt" class="form-label">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    Durée d'emprunt (jours)
+                </label>
+
+                <input
+                    type="number"
+                    class="form-control"
+                    id="duree_emprunt"
+                    name="duree_emprunt"
+                    min="1"
+                    value="{{ parametres.duree_emprunt }}"
+                    required
+                >
+
+                <div class="form-text">
+                    Nombre de jours autorisés pour chaque emprunt.
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Configuration générale</h5>
-        </div>
+            <div class="setting-field">
+                <label for="tarif_penalite" class="form-label">
+                    <i class="bi bi-cash-coin me-2"></i>
+                    Tarif de pénalité par jour (DH)
+                </label>
 
-        <div class="card-body">
+                <input
+                    type="number"
+                    class="form-control"
+                    id="tarif_penalite"
+                    name="tarif_penalite"
+                    min="0"
+                    step="0.01"
+                    value="{{ parametres.tarif_penalite|unlocalize }}"
+                    required
+                >
 
-            <form method="POST">
-                {% csrf_token %}
-
-                <div class="mb-4">
-                    <label for="duree_emprunt" class="form-label fw-bold">
-                        Durée d'emprunt (jours)
-                    </label>
-
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="duree_emprunt"
-                        name="duree_emprunt"
-                        min="1"
-                        value="{{ parametres.duree_emprunt }}"
-                        required
-                    >
-
-                    <div class="form-text">
-                        Nombre de jours autorisés pour chaque emprunt.
-                    </div>
+                <div class="form-text">
+                    Montant appliqué pour chaque jour de retard.
                 </div>
+            </div>
 
-                <div class="mb-4">
-                    <label for="tarif_penalite" class="form-label fw-bold">
-                        Tarif de pénalité par jour (DH)
-                    </label>
-
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="tarif_penalite"
-                        name="tarif_penalite"
-                        min="0"
-                        step="0.01"
-                        value="{{ parametres.tarif_penalite|unlocalize }}"
-                        required
-                    >
-
-                    <div class="form-text">
-                        Montant appliqué pour chaque jour de retard.
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-save px-4">
+                    <i class="bi bi-save me-2"></i>
                     Enregistrer les paramètres
                 </button>
+            </div>
 
-            </form>
+        </form>
 
-        </div>
     </div>
-
-    <div class="alert alert-info mt-4">
-        <strong>Information :</strong>
-        Les nouveaux paramètres seront utilisés pour les prochains emprunts.
-        Les emprunts déjà validés conservent leur durée appliquée.
-    </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+<div class="settings-info">
+    <div class="d-flex gap-3">
+        <i class="bi bi-info-circle fs-4"></i>
+        <div>
+            <strong>Information</strong>
+            <p class="mb-0 mt-1">
+                Les nouveaux paramètres seront utilisés pour les prochains emprunts.
+                Les emprunts déjà validés conservent leur durée appliquée.
+            </p>
+        </div>
+    </div>
+</div>
 
-</body>
-</html>
+{% endblock %}

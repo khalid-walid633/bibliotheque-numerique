@@ -1,158 +1,178 @@
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistiques de la bibliothèque</title>
+{% extends "base.html" %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+{% block title %}Statistiques | Bibliothèque Numérique{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+{% block page_heading %}Statistiques{% endblock %}
 
-<body class="bg-light">
+{% block extra_css %}
+<style>
+    .stat-card-label {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
 
-<div class="container py-5">
+    .stat-card-value {
+        font-weight: 700;
+        margin-bottom: 0;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>Statistiques de la bibliothèque</h2>
-            <p class="text-muted mb-0">
-                Vue générale des emprunts et des pénalités
-            </p>
-        </div>
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
 
-        <a href="{% url 'tableau_bord' %}"
-           class="btn btn-outline-primary">
-            Retour au tableau de bord
-        </a>
+{% block content %}
+
+<!-- En-tête de la page -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-2">Statistiques de la bibliothèque</h2>
+        <p class="text-muted mb-0">
+            Vue générale des emprunts et des pénalités
+        </p>
     </div>
+</div>
 
-    <h4 class="mb-3">Statistiques des emprunts</h4>
+<!-- Statistiques des emprunts -->
+<h4 class="fw-bold mb-3">Statistiques des emprunts</h4>
 
-    <div class="row g-3 mb-4">
+<div class="row g-4 mb-5">
 
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Total des emprunts</p>
-                    <h2>{{ total_emprunts }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Demandes en attente</p>
-                    <h2>{{ demandes_attente }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Emprunts en cours</p>
-                    <h2>{{ emprunts_actifs }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Emprunts terminés</p>
-                    <h2>{{ emprunts_termines }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Emprunts en retard</p>
-                    <h2 class="text-danger">{{ emprunts_retard }}</h2>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <h4 class="mb-3">Statistiques financières</h4>
-
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Total des pénalités</p>
-                    <h2 class="text-success">
-                        {{ total_penalites|floatformat:2 }} DH
-                    </h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Nombre de pénalités</p>
-                    <h2>{{ nombre_penalites }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted">Total des jours de retard</p>
-                    <h2>{{ total_jours_retard }}</h2>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Répartition des emprunts</h5>
-        </div>
-
-        <div class="card-body">
-            <div style="max-width: 500px; margin: auto;">
-                <canvas id="empruntsChart"></canvas>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Total des emprunts</p>
+                <h2 class="stat-card-value">{{ total_emprunts }}</h2>
             </div>
         </div>
     </div>
-    </div> <!-- Fin de la première carte -->
 
-    <!-- Nouvelle carte : évolution des pénalités -->
-    <div class="card shadow-sm border-0 mt-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Évolution des pénalités par mois</h5>
-        </div>
-        <div class="card-body">
-            <canvas id="penalitesChart"></canvas>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Demandes en attente</p>
+                <h2 class="stat-card-value">{{ demandes_attente }}</h2>
+            </div>
         </div>
     </div>
 
-</div> <!-- Fin du container -->
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Emprunts en cours</p>
+                <h2 class="stat-card-value">{{ emprunts_actifs }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Emprunts terminés</p>
+                <h2 class="stat-card-value">{{ emprunts_termines }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Emprunts en retard</p>
+                <h2 class="stat-card-value text-danger">{{ emprunts_retard }}</h2>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-<script>
-    const ctx = document.getElementById('empruntsChart');
+<!-- Statistiques financières -->
+<h4 class="fw-bold mb-3">Statistiques financières</h4>
 
-    new Chart(ctx, {
-        type: 'doughnut',
+<div class="row g-4 mb-5">
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Total des pénalités</p>
+                <h2 class="stat-card-value text-success">
+                    {{ total_penalites|floatformat:2 }} DH
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Nombre de pénalités</p>
+                <h2 class="stat-card-value">{{ nombre_penalites }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <p class="stat-card-label">Total des jours de retard</p>
+                <h2 class="stat-card-value">{{ total_jours_retard }}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Graphique : répartition des emprunts -->
+<div class="card mb-4">
+    <div class="card-header p-3">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-pie-chart me-2"></i>
+            Répartition des emprunts
+        </h5>
+    </div>
+
+    <div class="card-body p-4">
+        <div class="chart-container">
+            <canvas id="empruntsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Graphique : évolution des pénalités -->
+<div class="card">
+    <div class="card-header p-3">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-bar-chart-line me-2"></i>
+            Évolution des pénalités par mois
+        </h5>
+    </div>
+
+    <div class="card-body p-4">
+        <div class="chart-container">
+            <canvas id="penalitesChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const empruntsCanvas = document.getElementById("empruntsChart");
+
+    new Chart(empruntsCanvas, {
+        type: "doughnut",
         data: {
             labels: [
-                'Demandes en attente',
-                'Emprunts en cours',
-                'Emprunts terminés'
+                "Demandes en attente",
+                "Emprunts en cours",
+                "Emprunts terminés"
             ],
             datasets: [{
                 data: [
@@ -164,30 +184,30 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: "bottom"
                 }
             }
         }
     });
-</script>
 
-<script>
-    const penalitesCtx = document.getElementById('penalitesChart');
+    const penalitesCanvas = document.getElementById("penalitesChart");
 
-    new Chart(penalitesCtx, {
-        type: 'bar',
+    new Chart(penalitesCanvas, {
+        type: "bar",
         data: {
             labels: {{ labels_penalites|safe }},
             datasets: [{
-                label: 'Pénalités (DH)',
+                label: "Pénalités (DH)",
                 data: {{ valeurs_penalites|safe }},
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             scales: {
                 y: {
                     beginAtZero: true
@@ -196,7 +216,4 @@
         }
     });
 </script>
-
-
-</body>
-</html>
+{% endblock %}

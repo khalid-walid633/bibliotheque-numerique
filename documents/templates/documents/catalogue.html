@@ -1,643 +1,444 @@
 
-<!DOCTYPE html>
-<html lang="fr" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Catalogue | Bibliothèque Numérique</title>
+{% extends "base.html" %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+{% block title %}Catalogue | Bibliothèque Numérique{% endblock %}
 
-    <style>
-        :root {
-            color-scheme: light;
-            --bg: #f5f2e9;
-            --surface: #fffdf8;
-            --surface-soft: #eee9dc;
-            --text: #26352d;
-            --muted: #778078;
-            --primary: #315b45;
-            --primary-hover: #244633;
-            --accent: #c49a50;
-            --border: #e5dfd1;
-            --shadow: 0 8px 25px rgba(38, 53, 45, 0.07);
-            --nav: #203d30;
-        }
+{% block page_heading %}Catalogue{% endblock %}
 
-        html[data-theme="dark"] {
-            color-scheme: dark;
-            --bg: #171d1a;
-            --surface: #222b26;
-            --surface-soft: #303b34;
-            --text: #edf1e9;
-            --muted: #aab5ac;
-            --primary: #83ad91;
-            --primary-hover: #a3c6ad;
-            --accent: #d6b36d;
-            --border: #3a473e;
-            --shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            --nav: #111a15;
-        }
+{% block extra_css %}
+<style>
+    /* En-tête du catalogue */
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: "Segoe UI", Arial, sans-serif;
-            transition: background .25s, color .25s;
-        }
-
-        .navbar {
-            background: var(--nav);
-            padding: 14px 0;
-        }
-
-        .navbar-brand {
-            color: #fff !important;
-            font-size: 1.15rem;
-            letter-spacing: .2px;
-        }
-
-        .navbar .nav-link {
-            color: #dce7dd;
-            margin-left: 12px;
-        }
-
-        .navbar .nav-link:hover {
-            color: var(--accent);
-        }
-
-        .theme-button {
-            border: 1px solid rgba(255,255,255,.35);
-            color: white;
-            background: transparent;
-            border-radius: 30px;
-            padding: 7px 13px;
-            margin-left: 15px;
-        }
-
-        .theme-button:hover {
-            background: rgba(255,255,255,.12);
-        }
-
-        .hero {
-            padding: 42px 0 28px;
-        }
-
-        .hero-label {
-            color: var(--primary);
-            font-size: .8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .hero h1 {
-            font-family: Georgia, serif;
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            font-weight: 700;
-            margin: 10px 0;
-        }
-
-        .hero p {
-            color: var(--muted);
-            max-width: 600px;
-        }
-
-        .search-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: var(--shadow);
-            margin-bottom: 32px;
-        }
-
-        .form-control,
-        .form-select {
-            background-color: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-            min-height: 44px;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background-color: var(--surface);
-            color: var(--text);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 .2rem rgba(49, 91, 69, .12);
-        }
-
-        .form-control::placeholder {
-            color: var(--muted);
-        }
-
-        .btn-search {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            min-height: 44px;
-            font-weight: 600;
-        }
-
-        .btn-search:hover {
-            background: var(--primary-hover);
-            color: #fff;
-        }
-
-        .section-heading {
-            font-family: Georgia, serif;
-            font-weight: 700;
-        }
-
-        .results-count {
-            color: var(--muted);
-            font-size: .9rem;
-        }
-
-        .book-card {
-            height: 100%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform .2s, box-shadow .2s;
-        }
-
-        .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 14px 30px rgba(0,0,0,.13);
-        }
-
-        .cover-area {
-            height: 220px;
-            background: var(--surface-soft);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-        }
-
-        .book-cover {
-            max-width: 100%;
-            max-height: 195px;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border-radius: 3px;
-            box-shadow: 0 5px 14px rgba(0,0,0,.18);
-        }
-
-        .no-cover {
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .book-card .card-body {
-            padding: 18px;
-        }
-
-        .book-title {
-            color: var(--text);
-            font-family: Georgia, serif;
-            font-size: 1.08rem;
-            font-weight: 700;
-            line-height: 1.4;
-            min-height: 48px;
-        }
-
-        .book-info {
-            color: var(--muted);
-            font-size: .88rem;
-            margin-bottom: 7px;
-        }
-
-        .book-type {
-            background: var(--primary);
-            color: #fff;
-        }
-
-        .book-category {
-            background: var(--surface-soft);
-            color: var(--text);
-        }
-
-        .btn-details {
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 9px;
-        }
-
-        .btn-details:hover {
-            background: var(--primary);
-            color: #fff;
-        }
-
-        .empty-state {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 45px 20px;
-            text-align: center;
-            color: var(--muted);
-        }
-
-        .pagination .page-link {
-            background: var(--surface);
-            color: var(--primary);
-            border-color: var(--border);
-        }
-
-        .pagination .page-item.active .page-link {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #fff;
-        }
-
-        footer {
-            color: var(--muted);
-            border-top: 1px solid var(--border);
-            margin-top: 55px;
-            padding: 22px 0;
-            text-align: center;
-            font-size: .85rem;
-        }
-
-        @media (max-width: 576px) {
-            .hero {
-                padding-top: 30px;
-            }
-
-            .cover-area {
-                height: 200px;
-            }
-
-            .theme-button {
-                margin: 10px 0 0;
-            }
-        }
-        /* Responsive : smartphones */
-@media (max-width: 575.98px) {
-
-    .container {
-        padding-left: 18px;
-        padding-right: 18px;
+    .catalogue-header {
+        margin-bottom: 30px;
     }
 
-    .hero {
-        padding-top: 28px;
-        padding-bottom: 20px;
+    .catalogue-label {
+        color: var(--primary);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
-    .hero h1 {
-        font-size: 1.8rem;
-        line-height: 1.25;
+    .catalogue-header h2 {
+        font-weight: 700;
+        margin: 10px 0;
     }
 
-    .hero p {
-        font-size: .9rem;
-    }
+    /* Zone de recherche */
 
     .search-panel {
-        padding: 14px;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 32px;
     }
 
+    .search-panel .form-control,
+    .search-panel .form-select {
+        min-height: 46px;
+    }
+
+    .btn-search {
+        min-height: 46px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+
+    .btn-search:hover {
+        background: var(--primary-hover);
+        color: white;
+    }
+
+    /* En-tête des résultats */
+
     .section-heading {
-        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    .results-count {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* Cartes des documents */
+
+    .book-card {
+        height: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
     }
 
     .cover-area {
-        height: 260px;
+        height: 220px;
+        background: var(--surface-soft);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
     }
 
     .book-cover {
-        max-height: 235px;
+        max-width: 100%;
+        max-height: 195px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .no-cover {
+        color: var(--text-muted);
+        text-align: center;
     }
 
     .book-card .card-body {
-        padding: 16px;
+        padding: 18px;
     }
 
     .book-title {
-        min-height: auto;
-        font-size: 1.1rem;
+        color: var(--text);
+        font-size: 1.08rem;
+        font-weight: 700;
+        line-height: 1.4;
+        min-height: 48px;
     }
 
-    .navbar-brand {
-        font-size: .95rem;
+    .book-info {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin-bottom: 7px;
     }
 
-    .navbar .nav-link {
-        margin-left: 0;
-        padding: 10px 0;
+    .book-type {
+        background: var(--primary);
+        color: white;
     }
 
-    .theme-button {
-        margin-left: 0;
-        margin-bottom: 10px;
+    .book-category {
+        background: var(--surface-soft);
+        color: var(--text);
     }
 
-    body {
-        overflow-x: hidden;
+    .btn-details {
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 9px;
     }
-}
 
-/* Tablettes */
-@media (min-width: 576px) and (max-width: 991.98px) {
-    .cover-area {
-        height: 220px;
+    .btn-details:hover {
+        background: var(--primary);
+        color: white;
     }
-}
 
-/* Écrans larges */
-@media (min-width: 1400px) {
-    .container {
-        max-width: 1320px;
+    /* Aucun résultat */
+
+    .empty-state {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 50px 20px;
+        text-align: center;
+        color: var(--text-muted);
     }
-}
-    </style>
-</head>
 
-<body>
+    /* Pagination */
 
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
+    .pagination .page-link {
+        background: var(--surface);
+        color: var(--primary);
+        border-color: var(--border);
+    }
 
-        <a class="navbar-brand fw-bold" href="{% url 'catalogue' %}">
-            📚 Bibliothèque Numérique
-        </a>
+    .pagination .page-item.active .page-link {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
 
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                aria-controls="mainNavbar" aria-expanded="false"
-                aria-label="Ouvrir le menu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    @media (max-width: 576px) {
+        .cover-area {
+            height: 240px;
+        }
 
-        <div class="collapse navbar-collapse" id="mainNavbar">
-            <div class="navbar-nav ms-auto align-items-lg-center">
+        .book-cover {
+            max-height: 215px;
+        }
 
-                <a class="nav-link" href="{% url 'catalogue' %}">
-                    Catalogue
-                </a>
+        .search-panel {
+            padding: 15px;
+        }
 
-                <a class="nav-link" href="{% url 'mes_emprunts' %}">
-                    Mes emprunts
-                </a>
-<a class="nav-link" href="{% url 'mes_penalites' %}">
-    Mes pénalités
-</a>
+        .book-title {
+            min-height: auto;
+        }
+    }
+</style>
+{% endblock %}
 
-                <a class="nav-link" href="{% url 'demander_emprunt' %}">
-                    Demander un emprunt
-                </a>
 
-                <button type="button" class="theme-button"
-                        id="themeToggle" aria-label="Changer le thème">
-                    🌙 Mode sombre
-                </button>
+{% block content %}
 
-            </div>
-        </div>
-    </div>
-</nav>
+<!-- En-tête -->
+<div class="catalogue-header">
 
-<main class="container">
-
-    <section class="hero">
-        <div class="hero-label">Votre espace de lecture</div>
-
-        <h1>Explorez notre bibliothèque</h1>
-
-        <p>
-            Découvrez notre collection de livres et de documents.
-            Recherchez vos lectures préférées et consultez leurs informations.
-        </p>
-    </section>
-
-    <!-- Recherche et filtre -->
-    <form method="get" class="search-panel">
-        <div class="row g-3">
-
-            <div class="col-md-6">
-                <input
-                    type="search"
-                    name="q"
-                    class="form-control"
-                    placeholder="Rechercher un titre, un auteur ou un ISBN..."
-                    value="{{ recherche }}"
-                >
-            </div>
-
-            <div class="col-md-4">
-                <select name="categorie" class="form-select">
-                    <option value="">Toutes les catégories</option>
-
-                    {% for categorie in categories %}
-                        <option
-                            value="{{ categorie.id }}"
-                            {% if categorie_selectionnee == categorie.id|stringformat:"s" %}
-                                selected
-                            {% endif %}
-                        >
-                            {{ categorie.nom }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-2">
-                <button class="btn btn-search w-100" type="submit">
-                    Rechercher
-                </button>
-            </div>
-
-        </div>
-    </form>
-
-    <!-- Résultats -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="section-heading h4 mb-0">Notre collection</h2>
-
-        <span class="results-count">
-            {{ page_obj.paginator.count }} document(s)
-        </span>
+    <div class="catalogue-label">
+        Votre espace de lecture
     </div>
 
-    <!-- Cartes des livres -->
-    <div class="row g-4">
+    <h2>Explorez notre bibliothèque</h2>
 
-        {% for document in page_obj %}
+    <p class="text-muted mb-0">
+        Découvrez notre collection de livres et de documents.
+        Recherchez vos lectures préférées et consultez leurs informations.
+    </p>
 
-            <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+</div>
 
-                <article class="card book-card">
 
-                    <div class="cover-area">
+<!-- Recherche et filtres -->
+<form method="get" class="search-panel">
 
-                        {% if document.image %}
-                            <img
-                                src="{{ document.image.url }}"
-                                class="book-cover"
-                                alt="Couverture de {{ document.titre }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="no-cover">
-                                <div style="font-size: 3rem;">📖</div>
-                                <p class="mb-0">Couverture indisponible</p>
-                            </div>
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label for="searchInput" class="form-label fw-semibold">
+                Rechercher un document
+            </label>
+
+            <input
+                type="search"
+                id="searchInput"
+                name="q"
+                class="form-control"
+                placeholder="Titre, auteur ou ISBN..."
+                value="{{ recherche }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label for="categorySelect" class="form-label fw-semibold">
+                Catégorie
+            </label>
+
+            <select
+                name="categorie"
+                id="categorySelect"
+                class="form-select"
+            >
+                <option value="">Toutes les catégories</option>
+
+                {% for categorie in categories %}
+                    <option
+                        value="{{ categorie.id }}"
+                        {% if categorie_selectionnee == categorie.id|stringformat:"s" %}
+                            selected
                         {% endif %}
+                    >
+                        {{ categorie.nom }}
+                    </option>
+                {% endfor %}
 
-                    </div>
+            </select>
+        </div>
 
-                    <div class="card-body d-flex flex-column">
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-search w-100" type="submit">
+                <i class="bi bi-search me-1"></i>
+                Rechercher
+            </button>
+        </div>
 
-                        <div class="mb-3">
-                            <span class="badge book-type">
-                                {{ document.type_document }}
-                            </span>
+    </div>
 
-                            <span class="badge book-category">
-                                {{ document.categorie.nom }}
-                            </span>
+</form>
+
+
+<!-- Résultats -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+
+    <h4 class="section-heading mb-0">
+        <i class="bi bi-collection me-2"></i>
+        Notre collection
+    </h4>
+
+    <span class="results-count">
+        {{ page_obj.paginator.count }} document(s)
+    </span>
+
+</div>
+
+
+<!-- Cartes des documents -->
+<div class="row g-4">
+
+    {% for document in page_obj %}
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+
+            <article class="card book-card">
+
+                <!-- Couverture -->
+                <div class="cover-area">
+
+                    {% if document.image %}
+
+                        <img
+                            src="{{ document.image.url }}"
+                            class="book-cover"
+                            alt="Couverture de {{ document.titre }}"
+                            loading="lazy"
+                        >
+
+                    {% else %}
+
+                        <div class="no-cover">
+                            <i class="bi bi-book display-3"></i>
+                            <p class="mb-0 mt-2">
+                                Couverture indisponible
+                            </p>
                         </div>
 
-                        <h3 class="book-title">
-                            {{ document.titre }}
-                        </h3>
+                    {% endif %}
 
-                        <p class="book-info">
-                            <strong>Auteur :</strong> {{ document.auteur }}
-                        </p>
+                </div>
 
-                        <p class="book-info mb-4">
-                            <strong>Année :</strong>
-                            {{ document.annee_publication }}
-                        </p>
 
-                        <a
-                            href="{% url 'detail_document' document.pk %}"
-                            class="btn btn-details mt-auto"
-                        >
-                            Consulter le livre →
-                        </a>
+                <!-- Informations -->
+                <div class="card-body d-flex flex-column">
+
+                    <div class="mb-3 d-flex flex-wrap gap-2">
+
+                        <span class="badge book-type">
+                            {{ document.type_document }}
+                        </span>
+
+                        <span class="badge book-category">
+                            {{ document.categorie.nom }}
+                        </span>
 
                     </div>
 
-                </article>
+                    <h3 class="book-title">
+                        {{ document.titre }}
+                    </h3>
 
-            </div>
-
-        {% empty %}
-
-            <div class="col-12">
-                <div class="empty-state">
-                    <div style="font-size: 3rem;">📚</div>
-                    <h3 class="h5 mt-3">Aucun document trouvé</h3>
-                    <p class="mb-0">
-                        Essayez de modifier votre recherche ou votre catégorie.
+                    <p class="book-info">
+                        <i class="bi bi-person me-1"></i>
+                        <strong>Auteur :</strong>
+                        {{ document.auteur }}
                     </p>
+
+                    <p class="book-info mb-4">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <strong>Année :</strong>
+                        {{ document.annee_publication }}
+                    </p>
+
+                    <a
+                        href="{% url 'detail_document' document.pk %}"
+                        class="btn btn-details mt-auto"
+                    >
+                        Consulter le document
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+
                 </div>
+
+            </article>
+
+        </div>
+
+    {% empty %}
+
+        <div class="col-12">
+
+            <div class="empty-state">
+
+                <i class="bi bi-search display-3"></i>
+
+                <h3 class="h5 mt-3">
+                    Aucun document trouvé
+                </h3>
+
+                <p class="mb-0">
+                    Essayez de modifier votre recherche ou votre catégorie.
+                </p>
+
             </div>
 
-        {% endfor %}
+        </div>
 
-    </div>
+    {% endfor %}
 
-    <!-- Pagination -->
-    {% if page_obj.has_other_pages %}
+</div>
 
-        <nav class="mt-5" aria-label="Pagination du catalogue">
-            <ul class="pagination justify-content-center">
 
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.previous_page_number }}">
-                            Précédent
-                        </a>
-                    </li>
-                {% endif %}
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
 
-                <li class="page-item active">
-                    <span class="page-link">
-                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                    </span>
+    <nav class="mt-5" aria-label="Pagination du catalogue">
+
+        <ul class="pagination justify-content-center flex-wrap">
+
+            {% if page_obj.has_previous %}
+
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.previous_page_number }}"
+                    >
+                        <i class="bi bi-chevron-left me-1"></i>
+                        Précédent
+                    </a>
                 </li>
 
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.next_page_number }}">
-                            Suivant
-                        </a>
-                    </li>
-                {% endif %}
+            {% endif %}
 
-            </ul>
-        </nav>
 
-    {% endif %}
+            <li class="page-item active">
+                <span class="page-link">
+                    {{ page_obj.number }}
+                    /
+                    {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
 
-</main>
 
-<footer>
-    <div class="container">
-        📚 Bibliothèque Numérique — Votre savoir, votre espace.
-    </div>
-</footer>
+            {% if page_obj.has_next %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="?q={{ recherche|urlencode }}&categorie={{ categorie_selectionnee }}&page={{ page_obj.next_page_number }}"
+                    >
+                        Suivant
+                        <i class="bi bi-chevron-right ms-1"></i>
+                    </a>
+                </li>
 
-<script>
-    const themeToggle = document.getElementById("themeToggle");
-    const html = document.documentElement;
+            {% endif %}
 
-    function applyTheme(theme) {
-        html.setAttribute("data-theme", theme);
+        </ul>
 
-        if (theme === "dark") {
-            themeToggle.textContent = "☀️ Mode clair";
-        } else {
-            themeToggle.textContent = "🌙 Mode sombre";
-        }
-    }
+    </nav>
 
-    // Charger le thème sauvegardé
-    let savedTheme = "light";
+{% endif %}
 
-    try {
-        savedTheme = localStorage.getItem("bibliotheque-theme") || "light";
-    } catch (error) {
-        savedTheme = "light";
-    }
-
-    applyTheme(savedTheme);
-
-    // Changer le thème avec un clic
-    themeToggle.addEventListener("click", function () {
-        const currentTheme = html.getAttribute("data-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-        applyTheme(newTheme);
-
-        try {
-            localStorage.setItem("bibliotheque-theme", newTheme);
-        } catch (error) {
-            // Le changement de thème fonctionne même si le stockage est indisponible.
-        }
-    });
-</script>
-
-</body>
-</html>
+{% endblock %}

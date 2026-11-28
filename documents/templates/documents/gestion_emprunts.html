@@ -1,378 +1,391 @@
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des emprunts</title>
+{% extends "base.html" %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Gestion des emprunts | Bibliothèque Numérique{% endblock %}
+{% block page_heading %}Gestion des emprunts{% endblock %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #243447;
+{% block extra_css %}
+<style>
+    .page-intro {
+        margin-bottom: 28px;
+    }
+
+    .page-intro h2 {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .section-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow);
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .section-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: var(--surface-soft);
+        color: var(--primary);
+        font-size: 19px;
+    }
+
+    .table {
+        color: var(--text);
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .table th {
+        color: var(--text);
+        background: var(--surface-soft);
+        font-size: 0.82rem;
+        font-weight: 700;
+        white-space: nowrap;
+        padding: 14px;
+        border-color: var(--border);
+    }
+
+    .table td {
+        padding: 15px 14px;
+        border-color: var(--border);
+    }
+
+    .table tbody tr:hover {
+        background: var(--surface-soft);
+    }
+
+    .table .badge {
+        font-weight: 600;
+        padding: 7px 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 38px 20px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 35px;
+        color: var(--primary);
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h4 {
+        color: var(--text);
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .inventory-code {
+        background: var(--surface-soft);
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+        .section-card {
+            padding: 16px;
         }
+    }
+</style>
+{% endblock %}
 
-        .page-header {
-            background: #243447;
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
+{% block content %}
 
-        .content-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-        }
+<div class="page-intro">
+    <h2>Suivi des emprunts</h2>
+    <p class="text-muted mb-0">
+        Consultez les demandes, gérez les retours et suivez l'historique des emprunts.
+    </p>
+</div>
 
-        .table th {
-            background: #243447;
-            color: white;
-            white-space: nowrap;
-            padding: 15px;
-        }
 
-        .table td {
-            padding: 15px;
-            vertical-align: middle;
-        }
+<!-- SECTION 1 : DEMANDES EN ATTENTE -->
+<div class="section-card">
 
-        .table tbody tr:hover {
-            background: #f8f9fa;
-        }
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="section-icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <h3 class="section-title">Demandes en attente</h3>
+                <small class="text-muted">Demandes à traiter</small>
+            </div>
+        </div>
 
-        .btn {
-            border-radius: 6px;
-            padding: 8px 13px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 45px 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .empty-state h4 {
-            color: #243447;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container py-5">
-
-    <!-- En-tête -->
-    <div class="page-header">
-        <h1 class="h3 mb-2">Gestion des emprunts</h1>
-        <p class="mb-0">
-            Consultez les demandes et gérez les emprunts des abonnés.
-        </p>
+        <span class="badge text-bg-primary rounded-pill px-3 py-2">
+            {{ demandes|length }} demande(s)
+        </span>
     </div>
 
-    <!-- Messages Django -->
-    {% for message in messages %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close"
-                    data-bs-dismiss="alert" aria-label="Fermer">
-            </button>
-        </div>
-    {% endfor %}
+    {% if demandes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Abonné</th>
+                        <th>Document</th>
+                        <th>Exemplaire</th>
+                        <th>Date de demande</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
 
-    <div class="content-card">
-
-        <!-- SECTION 1 : DEMANDES EN ATTENTE -->
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h2 class="h5 mb-0">Demandes en attente</h2>
-
-            <span class="badge text-bg-primary">
-                {{ demandes|length }} demande(s)
-            </span>
-        </div>
-
-        {% if demandes %}
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead>
+                <tbody>
+                    {% for emprunt in demandes %}
                         <tr>
-                            <th>Abonné</th>
-                            <th>Document</th>
-                            <th>Exemplaire</th>
-                            <th>Date de demande</th>
-                            <th class="text-center">Actions</th>
+                            <td>
+                                <strong>{{ emprunt.abonne.username }}</strong>
+                            </td>
+
+                            <td>{{ emprunt.exemplaire.document.titre }}</td>
+
+                            <td>
+                                <span class="badge inventory-code">
+                                    {{ emprunt.exemplaire.code_inventaire }}
+                                </span>
+                            </td>
+
+                            <td>{{ emprunt.date_demande|date:"d/m/Y H:i" }}</td>
+
+                            <td>
+                                <form method="post"
+                                      class="d-flex justify-content-center gap-2 flex-wrap">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="emprunt_id"
+                                           value="{{ emprunt.pk }}">
+
+                                    <button class="btn btn-success btn-sm btn-action"
+                                            type="submit" name="action"
+                                            value="accepter">
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Accepter
+                                    </button>
+
+                                    <button class="btn btn-danger btn-sm btn-action"
+                                            type="submit" name="action"
+                                            value="refuser">
+                                        <i class="bi bi-x-lg me-1"></i>
+                                        Refuser
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h4>Aucune demande en attente</h4>
+            <p class="mb-0">Toutes les demandes d'emprunt ont été traitées.</p>
+        </div>
+    {% endif %}
+</div>
 
-                    <tbody>
-                        {% for emprunt in demandes %}
-                            <tr>
-                                <td>
-                                    <strong>
-                                        {{ emprunt.abonne.username }}
-                                    </strong>
-                                </td>
 
-                                <td>
-                                    {{ emprunt.exemplaire.document.titre }}
-                                </td>
+<!-- SECTION 2 : EMPRUNTS EN COURS -->
+<div class="section-card">
 
-                                <td>
-                                    <span class="badge text-bg-secondary">
-                                        {{ emprunt.exemplaire.code_inventaire }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {{ emprunt.date_demande|date:"d/m/Y H:i" }}
-                                </td>
-
-                                <td class="text-center">
-                                    <form method="post" class="d-flex justify-content-center gap-2 flex-wrap">
-                                        {% csrf_token %}
-
-                                        <input
-                                            type="hidden"
-                                            name="emprunt_id"
-                                            value="{{ emprunt.pk }}"
-                                        >
-
-                                        <button
-                                            class="btn btn-success btn-sm"
-                                            type="submit"
-                                            name="action"
-                                            value="accepter"
-                                        >
-                                            Accepter
-                                        </button>
-
-                                        <button
-                                            class="btn btn-danger btn-sm"
-                                            type="submit"
-                                            name="action"
-                                            value="refuser"
-                                        >
-                                            Refuser
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="section-icon">
+                <i class="bi bi-book-half"></i>
             </div>
-
-        {% else %}
-
-            <div class="empty-state">
-                <h4>Aucune demande en attente</h4>
-                <p class="text-muted mb-0">
-                    Toutes les demandes d'emprunt ont été traitées.
-                </p>
+            <div>
+                <h3 class="section-title">Emprunts en cours</h3>
+                <small class="text-muted">Suivi des documents empruntés</small>
             </div>
-
-        {% endif %}
-
-
-        <!-- SECTION 2 : EMPRUNTS EN COURS -->
-
-        <hr class="my-4">
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h2 class="h5 mb-0">Emprunts en cours</h2>
-
-            <span class="badge text-bg-warning">
-                {{ emprunts_actifs|length }} emprunt(s)
-            </span>
         </div>
 
-        {% if emprunts_actifs %}
+        <span class="badge text-bg-warning rounded-pill px-3 py-2">
+            {{ emprunts_actifs|length }} emprunt(s)
+        </span>
+    </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+    {% if emprunts_actifs %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Abonné</th>
+                        <th>Document</th>
+                        <th>Exemplaire</th>
+                        <th>Date d'emprunt</th>
+                        <th>Date limite</th>
+                        <th>État</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-                    <thead>
+                <tbody>
+                    {% for emprunt in emprunts_actifs %}
                         <tr>
-                            <th>Abonné</th>
-                            <th>Document</th>
-                            <th>Exemplaire</th>
-                            <th>Date d'emprunt</th>
-                            <th>Date limite</th>
-                            <th>État</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+                            <td>
+                                <strong>{{ emprunt.abonne.username }}</strong>
+                            </td>
 
-                    <tbody>
-                        {% for emprunt in emprunts_actifs %}
-                            <tr>
-                                <td>
-                                    <strong>
-                                        {{ emprunt.abonne.username }}
-                                    </strong>
-                                </td>
+                            <td>{{ emprunt.exemplaire.document.titre }}</td>
 
-                                <td>
-                                    {{ emprunt.exemplaire.document.titre }}
-                                </td>
+                            <td>
+                                <span class="badge inventory-code">
+                                    {{ emprunt.exemplaire.code_inventaire }}
+                                </span>
+                            </td>
 
-                                <td>
-                                    <span class="badge text-bg-secondary">
-                                        {{ emprunt.exemplaire.code_inventaire }}
+                            <td>{{ emprunt.date_emprunt|date:"d/m/Y" }}</td>
+
+                            <td>{{ emprunt.date_limite|date:"d/m/Y" }}</td>
+
+                            <td>
+                                {% if emprunt.date_limite < today %}
+                                    <span class="badge text-bg-danger">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        En retard
                                     </span>
-                                </td>
+                                {% else %}
+                                    <span class="badge text-bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        En cours
+                                    </span>
+                                {% endif %}
+                            </td>
 
-                                <td>
-                                    {{ emprunt.date_emprunt|date:"d/m/Y" }}
-                                </td>
+                            <td>
+                                <form method="post">
+                                    {% csrf_token %}
 
-                                <td>
-                                    {{ emprunt.date_limite|date:"d/m/Y" }}
-                                </td>
+                                    <input type="hidden" name="emprunt_id"
+                                           value="{{ emprunt.pk }}">
 
-                                <td>
-                                    {% if emprunt.date_limite < today %}
-                                        <span class="badge text-bg-danger">
-                                            En retard
-                                        </span>
-                                    {% else %}
-                                        <span class="badge text-bg-success">
-                                            En cours
-                                        </span>
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    <form method="post">
-                                        {% csrf_token %}
-
-                                        <input
-                                            type="hidden"
-                                            name="emprunt_id"
-                                            value="{{ emprunt.pk }}"
-                                        >
-
-                                        <button
-                                            class="btn btn-primary btn-sm"
-                                            type="submit"
-                                            name="action"
+                                    <button class="btn btn-primary btn-sm btn-action"
+                                            type="submit" name="action"
                                             value="retour"
-                                            onclick="return confirm('Confirmer le retour de cet exemplaire ?');"
-                                        >
-                                            Enregistrer le retour
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
-            </div>
-
-        {% else %}
-
-            <div class="empty-state">
-                <h4>Aucun emprunt en cours</h4>
-                <p class="text-muted mb-0">
-                    Les emprunts actifs apparaîtront ici.
-                </p>
-            </div>
-
-        {% endif %}
-
-    </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- HISTORIQUE DES EMPRUNTS TERMINÉS -->
-<div class="card shadow-sm mt-4">
-    <div class="card-header bg-dark text-white">
-        <h4 class="mb-0">Historique des emprunts terminés</h4>
-    </div>
-
-    <div class="card-body">
-        {% if emprunts_termines %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>Abonné</th>
-                            <th>Document</th>
-                            <th>Date d'emprunt</th>
-                            <th>Date limite</th>
-                            <th>Date de retour</th>
-                            <th>Retard</th>
-                            <th>Pénalité</th>
+                                            onclick="return confirm('Confirmer le retour de cet exemplaire ?');">
+                                        <i class="bi bi-arrow-return-left me-1"></i>
+                                        Enregistrer le retour
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for emprunt in emprunts_termines %}
-                            <tr>
-                                <td>{{ emprunt.abonne.username }}</td>
-
-                                <td>
-                                    {{ emprunt.exemplaire.document.titre }}
-                                </td>
-
-                                <td>
-                                    {{ emprunt.date_emprunt|date:"d/m/Y" }}
-                                </td>
-
-                                <td>
-                                    {{ emprunt.date_limite|date:"d/m/Y" }}
-                                </td>
-
-                                <td>
-                                    {{ emprunt.date_retour|date:"d/m/Y" }}
-                                </td>
-
-                                <td>
-                                    {% if emprunt.penalite %}
-                                        {{ emprunt.penalite.jours_retard }} jour(s)
-                                    {% else %}
-                                        0 jour
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    {% if emprunt.penalite %}
-                                        <span class="badge text-bg-danger">
-                                            {{ emprunt.penalite.montant }} DH
-                                        </span>
-                                    {% else %}
-                                        <span class="badge text-bg-success">
-                                            Aucune pénalité
-                                        </span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="text-muted mb-0">
-                Aucun emprunt terminé pour le moment.
-            </p>
-        {% endif %}
-    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-journal-check"></i>
+            <h4>Aucun emprunt en cours</h4>
+            <p class="mb-0">Les emprunts actifs apparaîtront ici.</p>
+        </div>
+    {% endif %}
 </div>
 
 
-</body>
-</html>
+<!-- SECTION 3 : HISTORIQUE DES EMPRUNTS TERMINÉS -->
+<div class="section-card">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="section-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div>
+                <h3 class="section-title">Historique des emprunts terminés</h3>
+                <small class="text-muted">Retours et pénalités</small>
+            </div>
+        </div>
+
+        <span class="badge text-bg-secondary rounded-pill px-3 py-2">
+            {{ emprunts_termines|length }} emprunt(s)
+        </span>
+    </div>
+
+    {% if emprunts_termines %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Abonné</th>
+                        <th>Document</th>
+                        <th>Date d'emprunt</th>
+                        <th>Date limite</th>
+                        <th>Date de retour</th>
+                        <th>Retard</th>
+                        <th>Pénalité</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for emprunt in emprunts_termines %}
+                        <tr>
+                            <td>{{ emprunt.abonne.username }}</td>
+
+                            <td>{{ emprunt.exemplaire.document.titre }}</td>
+
+                            <td>{{ emprunt.date_emprunt|date:"d/m/Y" }}</td>
+
+                            <td>{{ emprunt.date_limite|date:"d/m/Y" }}</td>
+
+                            <td>{{ emprunt.date_retour|date:"d/m/Y" }}</td>
+
+                            <td>
+                                {% if emprunt.penalite %}
+                                    {{ emprunt.penalite.jours_retard }} jour(s)
+                                {% else %}
+                                    0 jour
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if emprunt.penalite %}
+                                    <span class="badge text-bg-danger">
+                                        {{ emprunt.penalite.montant }} DH
+                                    </span>
+                                {% else %}
+                                    <span class="badge text-bg-success">
+                                        Aucune pénalité
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-archive"></i>
+            <h4>Aucun emprunt terminé</h4>
+            <p class="mb-0">L'historique des emprunts apparaîtra ici.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
