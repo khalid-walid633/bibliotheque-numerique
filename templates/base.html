@@ -66,12 +66,20 @@
     <i class="bi bi-bookmark-check"></i>
     <span>Mes emprunts</span>
 </a>
+<!-- Mes pénalités -->
+<a href="{% url 'mes_penalites' %}"
+   class="nav-link-custom {% if request.resolver_match.url_name == 'mes_penalites' %}active{% endif %}">
+    <i class="bi bi-cash-coin"></i>
+    <span>Mes pénalités</span>
+</a>
+
 <!-- Demander un emprunt -->
 <a href="{% url 'demander_emprunt' %}"
    class="nav-link-custom {% if request.resolver_match.url_name == 'demander_emprunt' %}active{% endif %}">
     <i class="bi bi-plus-circle"></i>
     <span>Demander un emprunt</span>
 </a>
+
 
     <a href="{% url 'statistiques_bibliotheque' %}"
        class="nav-link-custom {% if request.resolver_match.url_name == 'statistiques_bibliotheque' %}active{% endif %}">
