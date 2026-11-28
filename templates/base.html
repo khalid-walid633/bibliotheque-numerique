@@ -33,51 +33,77 @@
 
         <div class="sidebar-section">MENU PRINCIPAL</div>
 
-        <nav class="sidebar-nav">
+        
+<nav class="sidebar-nav">
 
-            <!-- Tableau de bord -->
-            <a href="{% url 'tableau_bord' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'tableau_bord' %}active{% endif %}">
-                <i class="bi bi-grid"></i>
-                <span>Tableau de bord</span>
-            </a>
+    <!-- Tableau de bord -->
+    {% if request.user.is_staff or request.user.role == "BIBLIOTHECAIRE" %}
+    <a href="{% url 'tableau_bord' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'tableau_bord' %}active{% endif %}">
+        <i class="bi bi-grid"></i>
+        <span>Tableau de bord</span>
+    </a>
+    {% endif %}
 
-            <!-- Catalogue -->
-            <a href="{% url 'catalogue' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'catalogue' %}active{% endif %}">
-                <i class="bi bi-journals"></i>
-                <span>Catalogue</span>
-            </a>
+    <!-- Catalogue -->
+    <a href="{% url 'catalogue' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'catalogue' %}active{% endif %}">
+        <i class="bi bi-journals"></i>
+        <span>Catalogue</span>
+    </a>
 
-            <!-- Gestion des emprunts -->
-            <a href="{% url 'gestion_emprunts' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'gestion_emprunts' %}active{% endif %}">
-                <i class="bi bi-arrow-left-right"></i>
-                <span>Gestion des emprunts</span>
-            </a>
+    <!-- Liens bibliothécaire -->
+    {% if request.user.is_staff or request.user.role == "BIBLIOTHECAIRE" %}
 
-            <!-- Statistiques -->
-            <a href="{% url 'statistiques_bibliotheque' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'statistiques_bibliotheque' %}active{% endif %}">
-                <i class="bi bi-bar-chart"></i>
-                <span>Statistiques</span>
-            </a>
+    <a href="{% url 'gestion_emprunts' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'gestion_emprunts' %}active{% endif %}">
+        <i class="bi bi-arrow-left-right"></i>
+        <span>Gestion des emprunts</span>
+    </a>
+    <!-- Mes emprunts -->
+<a href="{% url 'mes_emprunts' %}"
+   class="nav-link-custom {% if request.resolver_match.url_name == 'mes_emprunts' %}active{% endif %}">
+    <i class="bi bi-bookmark-check"></i>
+    <span>Mes emprunts</span>
+</a>
+<!-- Demander un emprunt -->
+<a href="{% url 'demander_emprunt' %}"
+   class="nav-link-custom {% if request.resolver_match.url_name == 'demander_emprunt' %}active{% endif %}">
+    <i class="bi bi-plus-circle"></i>
+    <span>Demander un emprunt</span>
+</a>
 
-            <!-- Abonnés -->
-            <a href="{% url 'liste_abonnes' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'liste_abonnes' %}active{% endif %}">
-                <i class="bi bi-people"></i>
-                <span>Abonnés</span>
-            </a>
+    <a href="{% url 'statistiques_bibliotheque' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'statistiques_bibliotheque' %}active{% endif %}">
+        <i class="bi bi-bar-chart"></i>
+        <span>Statistiques</span>
+    </a>
 
-            <!-- Paramètres -->
-            <a href="{% url 'parametres_bibliotheque' %}"
-               class="nav-link-custom {% if request.resolver_match.url_name == 'parametres_bibliotheque' %}active{% endif %}">
-                <i class="bi bi-gear"></i>
-                <span>Paramètres</span>
-            </a>
+    <a href="{% url 'liste_abonnes' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'liste_abonnes' %}active{% endif %}">
+        <i class="bi bi-people"></i>
+        <span>Abonnés</span>
+    </a>
 
-        </nav>
+    <a href="{% url 'parametres_bibliotheque' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'parametres_bibliotheque' %}active{% endif %}">
+        <i class="bi bi-gear"></i>
+        <span>Paramètres</span>
+    </a>
+
+    {% endif %}
+
+    <!-- Espace abonné -->
+    {% if not request.user.is_staff and request.user.role != "BIBLIOTHECAIRE" %}
+    <a href="{% url 'mes_emprunts' %}"
+       class="nav-link-custom {% if request.resolver_match.url_name == 'mes_emprunts' %}active{% endif %}">
+        <i class="bi bi-bookmark-check"></i>
+        <span>Mes emprunts</span>
+    </a>
+    {% endif %}
+
+</nav>
+
 
         <div class="sidebar-bottom">
             <div class="sidebar-section">COMPTE</div>

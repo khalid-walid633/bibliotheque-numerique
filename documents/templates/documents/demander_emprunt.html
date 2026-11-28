@@ -1,213 +1,368 @@
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "base.html" %}
 
-    <title>Demander un emprunt | Bibliothèque Numérique</title>
+{% block title %}Demander un emprunt | Bibliothèque Numérique{% endblock %}
+{% block page_heading %}Demander un emprunt{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+{% block extra_css %}
+<style>
+    /* INTRODUCTION */
+    .request-intro {
+        margin-bottom: 28px;
+    }
 
-    <style>
-        body {
-            background-color: #f5f7fb;
-            color: #26352d;
-            font-family: "Segoe UI", Arial, sans-serif;
+    .request-intro h2 {
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+
+    .request-intro p {
+        max-width: 650px;
+        line-height: 1.7;
+    }
+
+    /* CONTENEUR */
+    .request-container {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    /* CARTE */
+    .request-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .request-card-header {
+        padding: 23px 26px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .request-card-header h3 {
+        color: var(--text);
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .request-card-body {
+        padding: 28px;
+    }
+
+    /* FORMULAIRE */
+    .request-form label {
+        color: var(--text);
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .request-form .form-select {
+        min-height: 50px;
+        padding: 10px 14px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        color: var(--text);
+    }
+
+    .request-form .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(49, 91, 69, .15);
+    }
+
+    .request-form .form-select option {
+        background: var(--surface);
+        color: var(--text);
+    }
+
+    /* INFORMATION */
+    .request-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 10px;
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        color: var(--text);
+        line-height: 1.6;
+    }
+
+    .request-info i {
+        color: var(--primary);
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .request-info strong {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    /* BOUTONS */
+    .request-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 9px;
+        min-height: 46px;
+        padding: 12px 20px;
+
+        background-color: var(--primary) !important;
+        color: #fff !important;
+        border: 1px solid var(--primary) !important;
+        border-radius: 9px;
+
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+
+        transition: background-color .2s ease, transform .2s ease;
+    }
+
+    .request-btn:hover {
+        background-color: var(--primary-hover) !important;
+        border-color: var(--primary-hover) !important;
+        color: #fff !important;
+        transform: translateY(-2px);
+    }
+
+    .request-btn-secondary,
+    .request-btn-secondary:visited {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 17px;
+
+        background: var(--surface) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 9px;
+
+        text-decoration: none !important;
+        font-size: 14px;
+        font-weight: 600;
+        transition: .2s ease;
+    }
+
+    .request-btn-secondary:hover {
+        background: var(--surface-soft) !important;
+        color: var(--text) !important;
+        border-color: var(--primary) !important;
+    }
+
+    /* AUCUN EXEMPLAIRE */
+    .request-empty {
+        text-align: center;
+        padding: 35px 15px;
+    }
+
+    .request-empty-icon {
+        width: 75px;
+        height: 75px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        background: var(--surface-soft);
+        color: var(--primary);
+        font-size: 2.3rem;
+    }
+
+    .request-empty h4 {
+        color: var(--text);
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .request-empty p {
+        max-width: 460px;
+        margin: 0 auto 20px;
+        line-height: 1.7;
+    }
+
+    .request-footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 576px) {
+        .request-card-header {
+            padding: 19px;
         }
 
-        .navbar {
-            background-color: #203d30;
+        .request-card-body {
+            padding: 20px;
         }
 
-        .navbar-brand {
-            color: white;
-            font-weight: 700;
+        .request-btn,
+        .request-btn-secondary {
+            width: 100%;
         }
 
-        .main-container {
-            max-width: 750px;
-            margin: auto;
+        .request-footer {
+            width: 100%;
         }
+    }
+</style>
+{% endblock %}
 
-        .page-title {
-            font-weight: 700;
-            color: #26352d;
-        }
 
-        .form-card {
-            background: white;
-            border: none;
-            border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,.06);
-        }
+{% block content %}
 
-        .form-select {
-            min-height: 48px;
-            border-radius: 8px;
-        }
+<div class="request-container">
 
-        .btn-submit {
-            background: #315b45;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
+    <!-- INTRODUCTION -->
+    <div class="request-intro">
 
-        .btn-submit:hover {
-            background: #244633;
-            color: white;
-        }
+        <h2>Demander un emprunt</h2>
 
-        .info-box {
-            background: #f1f5f1;
-            border-left: 4px solid #315b45;
-            padding: 14px;
-            border-radius: 6px;
-            color: #536358;
-        }
+        <p class="text-muted mb-0">
+            Sélectionnez un exemplaire disponible pour envoyer
+            votre demande à la bibliothèque.
+        </p>
 
-        @media (max-width: 576px) {
-            .main-container {
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-
-            .form-card {
-                padding: 20px !important;
-            }
-
-            .btn-submit,
-            .btn-secondary {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<nav class="navbar navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'catalogue' %}">
-            📚 Bibliothèque Numérique
-        </a>
     </div>
-</nav>
 
-<main class="container py-5">
 
-    <div class="main-container">
+    <!-- CARTE PRINCIPALE -->
+    <div class="request-card">
 
-        <a href="{% url 'catalogue' %}"
-           class="btn btn-outline-secondary btn-sm mb-4">
-            ← Retour au catalogue
-        </a>
+        <div class="request-card-header">
 
-        <div class="mb-4">
-            <h1 class="page-title h2">Demander un emprunt</h1>
+            <h3>
+                <i class="bi bi-journal-plus me-2"></i>
+                Informations de l'emprunt
+            </h3>
 
-            <p class="text-secondary">
-                Sélectionnez un exemplaire disponible pour envoyer
-                votre demande à la bibliothèque.
+            <p class="text-muted small mb-0">
+                Choisissez un document parmi les exemplaires disponibles.
             </p>
+
         </div>
 
-        <!-- Messages Django -->
-        {% for message in messages %}
-            <div class="alert alert-info alert-dismissible fade show"
-                 role="alert">
-                {{ message }}
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="alert"
-                        aria-label="Fermer">
-                </button>
-            </div>
-        {% endfor %}
+        <div class="request-card-body">
 
-        <div class="card form-card">
-            <div class="card-body p-4 p-md-5">
+            {% if exemplaires %}
 
-                <div class="mb-4">
-                    <h2 class="h5 fw-bold">Informations de l'emprunt</h2>
+                <form method="POST" class="request-form">
 
-                    <p class="text-secondary small">
-                        Choisissez un livre parmi les exemplaires disponibles.
-                    </p>
-                </div>
+                    {% csrf_token %}
 
-                {% if exemplaires %}
+                    <div class="mb-4">
 
-                    <form method="POST">
-                        {% csrf_token %}
-
-                        <label for="exemplaire" class="form-label fw-semibold">
+                        <label for="exemplaire" class="form-label">
                             Choisir un exemplaire
                         </label>
 
                         <select
                             id="exemplaire"
                             name="exemplaire"
-                            class="form-select mb-4"
+                            class="form-select"
                             required
                         >
-                            <option value="">-- Sélectionner un livre --</option>
+
+                            <option value="">
+                                -- Sélectionner un livre --
+                            </option>
 
                             {% for exemplaire in exemplaires %}
+
                                 <option value="{{ exemplaire.id }}">
                                     {{ exemplaire.document.titre }}
                                     — {{ exemplaire.code_inventaire }}
                                 </option>
+
                             {% endfor %}
 
                         </select>
 
-                        <div class="info-box mb-4">
-                            <strong>Information :</strong>
+                    </div>
+
+
+                    <!-- INFORMATION -->
+                    <div class="request-info mb-4">
+
+                        <i class="bi bi-info-circle-fill"></i>
+
+                        <div>
+                            <strong>Information importante</strong>
+
                             Votre demande sera soumise à la bibliothèque.
                             Vous pourrez consulter son état dans
                             « Mes emprunts ».
                         </div>
 
-                        <button type="submit"
-                                class="btn btn-submit w-100">
-                            Envoyer ma demande →
-                        </button>
-
-                    </form>
-
-                {% else %}
-
-                    <div class="alert alert-warning mb-0">
-                        <h3 class="h6 fw-bold">Aucun exemplaire disponible</h3>
-                        <p class="mb-0">
-                            Il n'y a actuellement aucun exemplaire disponible
-                            pour une nouvelle demande.
-                        </p>
                     </div>
 
-                {% endif %}
 
-            </div>
-        </div>
+                    <!-- ENVOYER -->
+                    <button type="submit" class="request-btn w-100">
 
-        <div class="text-center mt-4">
-            <a href="{% url 'mes_emprunts' %}"
-               class="btn btn-outline-secondary">
-                Consulter mes emprunts
-            </a>
+                        <i class="bi bi-send"></i>
+                        Envoyer ma demande
+
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <!-- AUCUN EXEMPLAIRE DISPONIBLE -->
+                <div class="request-empty">
+
+                    <div class="request-empty-icon">
+                        <i class="bi bi-journal-x"></i>
+                    </div>
+
+                    <h4>Aucun exemplaire disponible</h4>
+
+                    <p class="text-muted">
+                        Il n'y a actuellement aucun exemplaire disponible
+                        pour une nouvelle demande. Veuillez réessayer
+                        ultérieurement.
+                    </p>
+
+                    <a href="{% url 'catalogue' %}"
+                       class="request-btn-secondary">
+
+                        <i class="bi bi-journals"></i>
+                        Explorer le catalogue
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
         </div>
 
     </div>
 
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- RETOUR AUX EMPRUNTS -->
+    <div class="request-footer">
 
-</body>
-</html>
+        <a href="{% url 'mes_emprunts' %}"
+           class="request-btn-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Consulter mes emprunts
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

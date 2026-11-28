@@ -23,7 +23,7 @@ urlpatterns = [
         name="logout",
     ),
 
-    path("emprunts/", include("documents.urls")),
+    path("", include("documents.urls")),
     path("utilisateurs/", include("users.urls")),
 ]
 if settings.DEBUG:
